@@ -16,5 +16,5 @@ type Deployment struct {
 	Config    struct {
 		SSH map[string]SSHConfig
 	}
-	Jobs []map[string]any
+	Jobs map[string]map[string]any
 }

@@ -1,10 +1,10 @@
 package internal
 
-import "context"
+import "github.com/SharkEzz/provisiond/pkg/context"
 
-// The Shell plugin take one or more strings as shell commands and execute them.
+// The Shell plugin take one string as shell command and execute it.
 type Shell struct{}
 
-func (s *Shell) Execute(ctx context.Context, data any) error {
-	return nil
+func (s *Shell) Execute(data any, ctx *context.PluginContext) error {
+	return ctx.ExecuteCommand(data.(string))
 }

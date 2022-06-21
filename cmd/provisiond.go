@@ -1,10 +1,12 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-
+	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
+)
+
+var (
+	commitHash = ""
 )
 
 func main() {
@@ -13,6 +15,9 @@ func main() {
 		panic(err)
 	}
 
-	data, _ := json.MarshalIndent(cfg, "", "  ")
-	fmt.Println(string(data))
+	exec := executor.NewExecutor(cfg)
+	err = exec.ExecuteJobs()
+	if err != nil {
+		panic(err)
+	}
 }
