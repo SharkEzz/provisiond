@@ -54,6 +54,7 @@ func (e *Executor) ExecuteJobs() error {
 
 func (e *Executor) ExecuteJob(jobName string, job map[string]any, ctx *context.PluginContext) error {
 	for key, value := range job {
+		// Skip keys that are not plugins
 		if key == "hosts" {
 			continue
 		}
