@@ -32,13 +32,18 @@ func (e *Executor) ExecuteJobs() error {
 	defer remote.CloseAllClients(clients)
 
 	for name, job := range e.Deployment.Jobs {
-		ctx := context.NewPluginContext(clients[job["hosts"].(string)])
+		jobHosts := job["hosts"].([]any)
+		for _, host := range jobHosts {
+			client, ok := clients[host.(string)]
+			if !ok {
+				return fmt.Errorf("host '%s' does not exist", host)
+			}
+			ctx := context.NewPluginContext(client)
 
-		// TODO: Loop over each hosts and execute the job
-
-		err := e.ExecuteJob(name, job, ctx)
-		if err != nil {
-			return err
+			err := e.ExecuteJob(name, job, ctx)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
