@@ -7,6 +7,7 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
 	"github.com/SharkEzz/provisiond/pkg/types"
+	"github.com/sirupsen/logrus"
 )
 
 type Executor struct {
@@ -38,7 +39,9 @@ func (e *Executor) ExecuteJobs() error {
 			if !ok {
 				return fmt.Errorf("host '%s' does not exist", host)
 			}
-			ctx := context.NewPluginContext(client)
+			ctx := context.NewPluginContext(client, logrus.New())
+
+			logrus.Info(fmt.Sprintf("executing job '%s' on host '%s'", name, host))
 
 			err := e.ExecuteJob(name, job, ctx)
 			if err != nil {

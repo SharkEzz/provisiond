@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -14,18 +15,21 @@ type Client struct {
 
 func (c *Client) ExecuteCommand(command string) error {
 	if c.sshClient == nil {
-		// TODO: log this
-		return fmt.Errorf("error: client is not created")
+		err := fmt.Errorf("error: client is not created")
+		logrus.Error(err)
+		return err
 	}
 
 	session, err := c.sshClient.NewSession()
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 	defer session.Close()
 
 	err = session.Run(command)
 	if err != nil {
+		logrus.Error(err)
 		return err
 	}
 
@@ -37,8 +41,10 @@ func (c *Client) ExecuteCommand(command string) error {
 func CloseAllClients(clients map[string]*Client) {
 	for _, client := range clients {
 		if client.sshClient != nil {
-			client.sshClient.Close()
-			// TODO: log error
+			err := client.sshClient.Close()
+			if err != nil {
+				logrus.Error(fmt.Errorf("cannot close client '%s'", client.name))
+			}
 		}
 	}
 }

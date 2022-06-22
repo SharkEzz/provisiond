@@ -6,6 +6,7 @@ import (
 
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -15,18 +16,19 @@ var (
 
 func main() {
 	flag.Parse()
+
 	if *file == "" {
-		panic(fmt.Errorf("file cannot be null"))
+		logrus.Panic(fmt.Errorf("file cannot be null"))
 	}
 
 	cfg, err := loader.GetLoader(*file).Load()
 	if err != nil {
-		panic(err)
+		logrus.Panic(err)
 	}
 
 	exec := executor.NewExecutor(cfg)
 	err = exec.ExecuteJobs()
 	if err != nil {
-		panic(err)
+		logrus.Panic(err)
 	}
 }

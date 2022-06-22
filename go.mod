@@ -7,4 +7,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
+require (
+	github.com/sirupsen/logrus v1.8.1
+	golang.org/x/sys v0.0.0-20220622161953-175b2fd9d664 // indirect
+)
