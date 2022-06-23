@@ -39,11 +39,11 @@ func (e *Executor) ExecuteJobs() error {
 			if !ok {
 				return fmt.Errorf("host '%s' does not exist", host)
 			}
-			ctx := context.NewPluginContext(client, logrus.New())
+			ctx := context.NewPluginContext(name, client, logrus.New())
 
 			logrus.Info(fmt.Sprintf("executing job '%s' on host '%s'", name, host))
 
-			err := e.ExecuteJob(name, job, ctx)
+			err := e.ExecuteJob(job, ctx)
 			if err != nil {
 				return err
 			}
@@ -52,7 +52,7 @@ func (e *Executor) ExecuteJobs() error {
 	return nil
 }
 
-func (e *Executor) ExecuteJob(jobName string, job map[string]any, ctx *context.PluginContext) error {
+func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error {
 	for key, value := range job {
 		// Skip keys that are not plugins
 		if key == "hosts" {

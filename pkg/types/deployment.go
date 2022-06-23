@@ -1,5 +1,6 @@
 package types
 
+// The SSHConfig struct hold a SSH configuration for a single host
 type SSHConfig struct {
 	Host     string
 	Port     uint16

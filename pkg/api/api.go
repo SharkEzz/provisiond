@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	handlers_v1 "github.com/SharkEzz/provisiond/pkg/api/handlers/v1"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
@@ -42,17 +43,8 @@ func NewAPI(host string, port uint16, password string) *API {
 		return c.Next()
 	})
 
-	v1.Get("/healthcheck", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"success": true,
-		})
-	})
-	v1.Post("/deploy", func(c *fiber.Ctx) error {
-		// TODO
-		return c.JSON(fiber.Map{
-			"wip": true,
-		})
-	})
+	v1.Get("/healthcheck", handlers_v1.HandleGetHealthcheck)
+	v1.Post("/deploy", handlers_v1.HandlePostDeploy)
 
 	return &API{
 		host:     host,

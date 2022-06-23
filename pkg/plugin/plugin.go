@@ -8,7 +8,7 @@ import (
 // The Plugin interface define one method,
 // which execute the content of the associated content in the deployment file.
 type Plugin interface {
-	Execute(data any, ctx *context.PluginContext) error
+	Execute(data any, ctx *context.JobContext) error
 }
 
 // The Plugins map contain all the registered plugins,
