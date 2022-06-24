@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	handlers_v1 "github.com/SharkEzz/provisiond/pkg/api/handlers/v1"
+	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	"github.com/sirupsen/logrus"
 )
 
 type API struct {
@@ -36,7 +36,7 @@ func NewAPI(host string, port uint16, password string) *API {
 	})
 
 	v1.Use(func(c *fiber.Ctx) error {
-		logrus.Infof("Handling %s request from %s on path '%s'", c.Method(), c.IP(), c.Path())
+		fmt.Println(logging.Log(fmt.Sprintf("Handling %s request from %s on path '%s'", c.Method(), c.IP(), c.Path())))
 
 		c.Locals("channel", ch)
 
@@ -70,7 +70,7 @@ func NewAPI(host string, port uint16, password string) *API {
 }
 
 func (a *API) Start() {
-	logrus.Infof("Starting API server on '%s:%d'", a.host, a.port)
+	fmt.Println(logging.Log(fmt.Sprintf("Starting API on %s:%d", a.host, a.port)))
 
 	a.fiber.Listen(fmt.Sprintf("%s:%d", a.host, a.port))
 }

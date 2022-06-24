@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
@@ -24,7 +25,10 @@ func HandlePostDeploy(c *fiber.Ctx) error {
 		return c.JSON(err)
 	}
 
-	go executor.NewExecutor(deployment, ch).ExecuteJobs()
+	go func() {
+		time.Sleep(time.Second)
+		executor.NewExecutor(deployment, ch).ExecuteJobs()
+	}()
 
 	return c.JSON(fiber.Map{
 		"started": true,

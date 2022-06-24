@@ -7,7 +7,7 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
-	"github.com/sirupsen/logrus"
+	"github.com/SharkEzz/provisiond/pkg/logging"
 )
 
 var (
@@ -21,23 +21,23 @@ func main() {
 
 	if *enableAPI {
 		if *apiPassword == "" {
-			logrus.Panic("apiPassword cannot be blank")
+			fmt.Println(logging.Log("apiPassword cannot be blank"))
 		}
 		api.NewAPI("0.0.0.0", 7655, *apiPassword).Start()
 		return
 	}
 
 	if *file == "" {
-		logrus.Panic(fmt.Errorf("file cannot be null"))
+		panic(fmt.Errorf("file cannot be null"))
 	}
 
 	cfg, err := loader.GetLoader(*file).Load()
 	if err != nil {
-		logrus.Panic(err)
+		panic(err)
 	}
 
 	err = executor.NewExecutor(cfg, nil).ExecuteJobs()
 	if err != nil {
-		logrus.Panic(err)
+		panic(err)
 	}
 }

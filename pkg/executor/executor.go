@@ -5,9 +5,9 @@ import (
 
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
+	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
-	"github.com/sirupsen/logrus"
 )
 
 type Executor struct {
@@ -77,9 +77,11 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 }
 
 func (e *Executor) Log(data string) {
-	logrus.Info(data)
+	logging.LogOut(data)
 
 	if e.outputChannel != nil {
-		e.outputChannel <- data
+		go func() {
+			e.outputChannel <- logging.Log(data)
+		}()
 	}
 }
