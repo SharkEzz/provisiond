@@ -4,13 +4,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/SharkEzz/provisiond/pkg/types"
+	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"gopkg.in/yaml.v3"
 )
 
 // The Loader interface represent a custom loader for loading a deployment configuration.
 type Loader interface {
-	Load() (*types.Deployment, error)
+	Load() (*deployment.Deployment, error)
 }
 
 // GetLoader return the correct type of Loader regarding what type of data is passed to it.
@@ -24,7 +24,7 @@ func GetLoader(name string) Loader {
 }
 
 // parseYaml expand all the variables found then parse the entire configuration file.
-func parseYAML(content []byte) (*types.Deployment, error) {
+func parseYAML(content []byte) (*deployment.Deployment, error) {
 	type variables struct {
 		Variables map[string]string
 	}
@@ -50,7 +50,7 @@ func parseYAML(content []byte) (*types.Deployment, error) {
 		}
 	}
 
-	deployment := &types.Deployment{}
+	deployment := &deployment.Deployment{}
 	err = yaml.Unmarshal(content, deployment)
 	if err != nil {
 		return nil, err

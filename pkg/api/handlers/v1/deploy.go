@@ -23,13 +23,9 @@ func HandlePostDeploy(c *fiber.Ctx) error {
 		return c.JSON(err)
 	}
 
-	err = executor.NewExecutor(deployment).ExecuteJobs()
-	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		return c.JSON(err)
-	}
+	go executor.NewExecutor(deployment).ExecuteJobs()
 
 	return c.JSON(fiber.Map{
-		"done": true,
+		"started": true,
 	})
 }

@@ -4,19 +4,19 @@ import (
 	"fmt"
 
 	"github.com/SharkEzz/provisiond/pkg/context"
+	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
-	"github.com/SharkEzz/provisiond/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
 type Executor struct {
-	Deployment *types.Deployment
+	Deployment *deployment.Deployment
 }
 
-func NewExecutor(deployment *types.Deployment) *Executor {
+func NewExecutor(dployment *deployment.Deployment) *Executor {
 	return &Executor{
-		deployment,
+		dployment,
 	}
 }
 
@@ -41,7 +41,7 @@ func (e *Executor) ExecuteJobs() error {
 			}
 			ctx := context.NewPluginContext(name, client, logrus.New())
 
-			logrus.Info(fmt.Sprintf("executing job '%s' on host '%s'", name, host))
+			logrus.Info(fmt.Sprintf("Executing job '%s' on host '%s'", name, host))
 
 			err := e.ExecuteJob(job, ctx)
 			if err != nil {
@@ -49,6 +49,8 @@ func (e *Executor) ExecuteJobs() error {
 			}
 		}
 	}
+
+	logrus.Infof("Deployment '%s' done, executed %d jobs", e.Deployment.Name, len(e.Deployment.Jobs))
 	return nil
 }
 
