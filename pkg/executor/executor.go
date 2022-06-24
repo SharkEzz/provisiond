@@ -80,8 +80,11 @@ func (e *Executor) Log(data string) {
 	logging.LogOut(data)
 
 	if e.outputChannel != nil {
-		go func() {
-			e.outputChannel <- logging.Log(data)
-		}()
+		select {
+		case e.outputChannel <- logging.Log(data):
+			break
+		default:
+			break
+		}
 	}
 }
