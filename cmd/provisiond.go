@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	commitHash  = ""
 	file        = flag.String("file", "", "The path to the configuration file to execute")
 	enableAPI   = flag.Bool("api", false, "Set to true to enable the integrated REST API")
 	apiPassword = flag.String("apiPassword", "", "The REST API password")
@@ -37,8 +36,7 @@ func main() {
 		logrus.Panic(err)
 	}
 
-	exec := executor.NewExecutor(cfg)
-	err = exec.ExecuteJobs()
+	err = executor.NewExecutor(cfg, nil).ExecuteJobs()
 	if err != nil {
 		logrus.Panic(err)
 	}

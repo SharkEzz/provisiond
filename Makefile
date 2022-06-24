@@ -6,7 +6,7 @@ BUILD_COMMIT_SHORT = $(shell git rev-parse --short HEAD)
 build: $(BUILD_DIR)/$(APP_NAME)
 
 $(BUILD_DIR)/$(APP_NAME):
-	go build -trimpath -o $(BUILD_DIR)/$(APP_NAME) --ldflags="-X 'main.commitHash=$(BUILD_COMMIT_SHORT)'" ./cmd/provisiond.go
+	go build -trimpath -o $(BUILD_DIR)/$(APP_NAME) ./cmd/provisiond.go
 
 .PHONY: clean
 clean:

@@ -11,16 +11,20 @@ import (
 )
 
 type Executor struct {
-	Deployment *deployment.Deployment
+	Deployment    *deployment.Deployment
+	outputChannel chan string
 }
 
-func NewExecutor(dployment *deployment.Deployment) *Executor {
+func NewExecutor(dployment *deployment.Deployment, outputChannel chan string) *Executor {
 	return &Executor{
 		dployment,
+		outputChannel,
 	}
 }
 
 func (e *Executor) ExecuteJobs() error {
+	e.Log(fmt.Sprintf("Starting execution of deployment '%s'", e.Deployment.Name))
+
 	clients := map[string]*remote.Client{}
 
 	for name, config := range e.Deployment.Config.SSH {
@@ -39,9 +43,9 @@ func (e *Executor) ExecuteJobs() error {
 			if !ok {
 				return fmt.Errorf("host '%s' does not exist", host)
 			}
-			ctx := context.NewPluginContext(name, client, logrus.New())
+			ctx := context.NewPluginContext(name, client, e.Log)
 
-			logrus.Info(fmt.Sprintf("Executing job '%s' on host '%s'", name, host))
+			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", name, host))
 
 			err := e.ExecuteJob(job, ctx)
 			if err != nil {
@@ -50,7 +54,7 @@ func (e *Executor) ExecuteJobs() error {
 		}
 	}
 
-	logrus.Infof("Deployment '%s' done, executed %d jobs", e.Deployment.Name, len(e.Deployment.Jobs))
+	e.Log(fmt.Sprintf("Deployment '%s' done, executed %d jobs", e.Deployment.Name, len(e.Deployment.Jobs)))
 	return nil
 }
 
@@ -70,4 +74,12 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 	}
 
 	return nil
+}
+
+func (e *Executor) Log(data string) {
+	logrus.Info(data)
+
+	if e.outputChannel != nil {
+		e.outputChannel <- data
+	}
 }

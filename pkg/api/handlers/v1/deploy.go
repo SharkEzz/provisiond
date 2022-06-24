@@ -16,6 +16,7 @@ func HandlePostDeploy(c *fiber.Ctx) error {
 			"error": "request body cannot be empty",
 		})
 	}
+	ch := c.Locals("channel").(chan string)
 
 	deployment, err := loader.GetLoader(string(config)).Load()
 	if err != nil {
@@ -23,7 +24,7 @@ func HandlePostDeploy(c *fiber.Ctx) error {
 		return c.JSON(err)
 	}
 
-	go executor.NewExecutor(deployment).ExecuteJobs()
+	go executor.NewExecutor(deployment, ch).ExecuteJobs()
 
 	return c.JSON(fiber.Map{
 		"started": true,

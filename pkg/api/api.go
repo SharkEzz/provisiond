@@ -6,6 +6,7 @@ import (
 
 	handlers_v1 "github.com/SharkEzz/provisiond/pkg/api/handlers/v1"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,10 +25,23 @@ func NewAPI(host string, port uint16, password string) *API {
 
 	v1 := app.Group("/v1")
 
+	ch := make(chan string)
+
+	v1.Use("/ws", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
 	v1.Use(func(c *fiber.Ctx) error {
 		logrus.Infof("Handling %s request from %s on path '%s'", c.Method(), c.IP(), c.Path())
 
-		if string(c.Request().URI().LastPathSegment()) == "healthcheck" {
+		c.Locals("channel", ch)
+
+		if string(c.Request().URI().LastPathSegment()) == "healthcheck" ||
+			string(c.Request().URI().LastPathSegment()) == "ws" {
 			return c.Next()
 		}
 
@@ -45,6 +59,7 @@ func NewAPI(host string, port uint16, password string) *API {
 
 	v1.Get("/healthcheck", handlers_v1.HandleGetHealthcheck)
 	v1.Post("/deploy", handlers_v1.HandlePostDeploy)
+	v1.Get("/ws", websocket.New(handlers_v1.HandleGetWebsocket))
 
 	return &API{
 		host:     host,
