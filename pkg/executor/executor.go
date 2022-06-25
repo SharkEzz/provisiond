@@ -36,16 +36,17 @@ func (e *Executor) ExecuteJobs() error {
 	}
 	defer remote.CloseAllClients(clients)
 
-	for name, job := range e.Deployment.Jobs {
+	for _, job := range e.Deployment.Jobs {
+		jobName := job["name"].(string)
 		jobHosts := job["hosts"].([]any)
 		for _, host := range jobHosts {
 			client, ok := clients[host.(string)]
 			if !ok {
 				return fmt.Errorf("host '%s' does not exist", host)
 			}
-			ctx := context.NewPluginContext(name, client, e.Log)
+			ctx := context.NewPluginContext(jobName, client, e.Log)
 
-			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", name, host))
+			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
 
 			err := e.ExecuteJob(job, ctx)
 			if err != nil {
@@ -61,7 +62,7 @@ func (e *Executor) ExecuteJobs() error {
 func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error {
 	for key, value := range job {
 		// Skip keys that are not plugins
-		if key == "hosts" {
+		if key == "hosts" || key == "name" {
 			continue
 		}
 
