@@ -9,7 +9,7 @@ export default function Navbar() {
       bg="green.600"
       color="white"
       align="center"
-      px={4}
+      px={8}
     >
       <Text as="span" fontWeight="bold" fontSize="xl">
         provisiond

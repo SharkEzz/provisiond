@@ -1,9 +1,18 @@
 package v1
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"net/http"
 
-func HandleGetHealthcheck(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"success": true,
-	})
+	"github.com/SharkEzz/provisiond/pkg/api/utils"
+)
+
+func (a *API) HandleGetHealthcheck(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	utils.ReturnJson(map[string]any{
+		"result": "ok",
+	}, w)
 }

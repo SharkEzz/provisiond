@@ -8,16 +8,21 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
+	"github.com/google/uuid"
 )
 
 type Executor struct {
 	Deployment    *deployment.Deployment
-	outputChannel chan string
+	UUID          string
+	outputChannel chan map[string]string
 }
 
-func NewExecutor(dployment *deployment.Deployment, outputChannel chan string) *Executor {
+func NewExecutor(dployment *deployment.Deployment, outputChannel chan map[string]string) *Executor {
+	uuid := uuid.NewString()
+
 	return &Executor{
 		dployment,
+		uuid,
 		outputChannel,
 	}
 }
@@ -81,8 +86,12 @@ func (e *Executor) Log(data string) {
 	logging.LogOut(data)
 
 	if e.outputChannel != nil {
+		logData := map[string]string{
+			"log":  logging.Log(data),
+			"uuid": e.UUID,
+		}
 		select {
-		case e.outputChannel <- logging.Log(data):
+		case e.outputChannel <- logData:
 			break
 		default:
 			break

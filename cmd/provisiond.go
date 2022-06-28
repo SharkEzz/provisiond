@@ -23,7 +23,7 @@ func main() {
 		if *apiPassword == "" {
 			fmt.Println(logging.Log("apiPassword cannot be blank"))
 		}
-		api.NewAPI("0.0.0.0", 7655, *apiPassword).Start()
+		api.StartAPI("0.0.0.0", 7655, *apiPassword)
 		return
 	}
 
