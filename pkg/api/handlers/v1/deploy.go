@@ -34,7 +34,7 @@ func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	executr := executor.NewExecutor(cfg, a.OutputChannel)
+	executr := executor.NewExecutor(cfg)
 
 	go func() {
 		executr.ExecuteJobs()

@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	err = executor.NewExecutor(cfg, nil).ExecuteJobs()
+	err = executor.NewExecutor(cfg).ExecuteJobs()
 	if err != nil {
 		panic(err)
 	}

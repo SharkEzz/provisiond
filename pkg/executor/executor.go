@@ -12,18 +12,16 @@ import (
 )
 
 type Executor struct {
-	Deployment    *deployment.Deployment
-	UUID          string
-	outputChannel chan map[string]string
+	Deployment *deployment.Deployment
+	UUID       string
 }
 
-func NewExecutor(dployment *deployment.Deployment, outputChannel chan map[string]string) *Executor {
+func NewExecutor(dployment *deployment.Deployment) *Executor {
 	uuid := uuid.NewString()
 
 	return &Executor{
 		dployment,
 		uuid,
-		outputChannel,
 	}
 }
 
@@ -76,7 +74,13 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 			return fmt.Errorf("error: plugin '%s' does not exist", key)
 		}
 
-		plg.Execute(value.(string), ctx)
+		output, err := plg.Execute(value.(string), ctx)
+		if err != nil {
+			return err
+		}
+		if output != "" {
+			e.Log(fmt.Sprintf("Job output: %s", output))
+		}
 	}
 
 	return nil
@@ -84,17 +88,4 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 
 func (e *Executor) Log(data string) {
 	logging.LogOut(data)
-
-	if e.outputChannel != nil {
-		logData := map[string]string{
-			"log":  logging.Log(data),
-			"uuid": e.UUID,
-		}
-		select {
-		case e.outputChannel <- logData:
-			break
-		default:
-			break
-		}
-	}
 }

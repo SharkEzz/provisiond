@@ -10,7 +10,7 @@ type JobContext struct {
 	logger  func(data string)
 }
 
-func (p *JobContext) ExecuteCommand(command string) error {
+func (p *JobContext) ExecuteCommand(command string) (string, error) {
 	return p.client.ExecuteCommand(command)
 }
 
