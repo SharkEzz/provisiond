@@ -13,13 +13,12 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
 import Layout from '../components/Layout';
 
 export default function HomePage() {
   return (
     <Layout title="Dashboard">
-      <Button as={NavLink} to="/create" mb={3} colorScheme="blue">
+      <Button as="a" href="/create" mb={3} colorScheme="blue">
         New
       </Button>
       <TableContainer boxShadow="md">
