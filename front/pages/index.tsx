@@ -1,7 +1,6 @@
 import { ChevronRightIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import {
   Badge,
-  Button,
   Flex,
   IconButton,
   Table,
@@ -14,13 +13,12 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import Layout from '../components/Layout';
+import Link from '../components/Link';
 
 export default function HomePage() {
   return (
     <Layout title="Dashboard">
-      <Button as="a" href="/create" mb={3} colorScheme="blue">
-        New
-      </Button>
+      <Link href="/create">New</Link>
       <TableContainer boxShadow="md">
         <Table variant="striped">
           <TableCaption>List of deployments</TableCaption>

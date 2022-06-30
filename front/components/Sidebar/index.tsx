@@ -1,4 +1,5 @@
-import { Link, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
+import Link from '../Link';
 
 export default function Sidebar() {
   return (
