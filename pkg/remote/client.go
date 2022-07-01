@@ -13,29 +13,27 @@ type Client struct {
 	sshClient *ssh.Client
 }
 
-func (c *Client) ExecuteCommand(command string) error {
+func (c *Client) ExecuteCommand(command string) (string, error) {
 	if c.sshClient == nil {
 		err := fmt.Errorf("error: client is not created")
 		fmt.Println(logging.Log(err.Error()))
-		return err
+		return "", err
 	}
 
 	session, err := c.sshClient.NewSession()
 	if err != nil {
 		fmt.Println(logging.Log(err.Error()))
-		return err
+		return "", err
 	}
 	defer session.Close()
 
-	err = session.Run(command)
+	output, err := session.Output(command)
 	if err != nil {
 		fmt.Println(logging.Log(err.Error()))
-		return err
+		return "", err
 	}
 
-	// TODO: get the stdout / stderr output ?
-
-	return nil
+	return string(output), nil
 }
 
 func CloseAllClients(clients map[string]*Client) {

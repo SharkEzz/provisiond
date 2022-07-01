@@ -23,7 +23,7 @@ func main() {
 		if *apiPassword == "" {
 			fmt.Println(logging.Log("apiPassword cannot be blank"))
 		}
-		api.NewAPI("0.0.0.0", 7655, *apiPassword).Start()
+		api.StartAPI("0.0.0.0", 7655, *apiPassword)
 		return
 	}
 
@@ -36,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	err = executor.NewExecutor(cfg, nil).ExecuteJobs()
+	err = executor.NewExecutor(cfg).ExecuteJobs()
 	if err != nil {
 		panic(err)
 	}

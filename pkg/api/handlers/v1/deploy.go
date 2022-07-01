@@ -1,36 +1,47 @@
 package v1
 
 import (
+	"io"
 	"net/http"
-	"time"
 
+	"github.com/SharkEzz/provisiond/pkg/api/utils"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
-	"github.com/gofiber/fiber/v2"
 )
 
-func HandlePostDeploy(c *fiber.Ctx) error {
-	config := string(c.Body())
-	if config == "" {
-		c.Status(http.StatusBadRequest)
-		return c.JSON(fiber.Map{
-			"error": "request body cannot be empty",
-		})
+func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
-	ch := c.Locals("channel").(chan string)
 
-	deployment, err := loader.GetLoader(string(config)).Load()
+	body := req.Body
+	data, err := io.ReadAll(body)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		return c.JSON(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		utils.ReturnJson(map[string]any{
+			"error": err,
+		}, w)
+		return
 	}
+
+	cfg, err := loader.GetLoader(string(data)).Load()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.ReturnJson(map[string]any{
+			"error": err,
+		}, w)
+		return
+	}
+
+	executr := executor.NewExecutor(cfg)
 
 	go func() {
-		time.Sleep(time.Second)
-		executor.NewExecutor(deployment, ch).ExecuteJobs()
+		executr.ExecuteJobs()
 	}()
 
-	return c.JSON(fiber.Map{
-		"started": true,
-	})
+	utils.ReturnJson(map[string]any{
+		"success": true,
+		"uuid":    executr.UUID,
+	}, w)
 }

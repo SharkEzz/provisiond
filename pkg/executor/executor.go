@@ -8,17 +8,20 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
+	"github.com/google/uuid"
 )
 
 type Executor struct {
-	Deployment    *deployment.Deployment
-	outputChannel chan string
+	Deployment *deployment.Deployment
+	UUID       string
 }
 
-func NewExecutor(dployment *deployment.Deployment, outputChannel chan string) *Executor {
+func NewExecutor(dployment *deployment.Deployment) *Executor {
+	uuid := uuid.NewString()
+
 	return &Executor{
 		dployment,
-		outputChannel,
+		uuid,
 	}
 }
 
@@ -36,16 +39,17 @@ func (e *Executor) ExecuteJobs() error {
 	}
 	defer remote.CloseAllClients(clients)
 
-	for name, job := range e.Deployment.Jobs {
+	for _, job := range e.Deployment.Jobs {
+		jobName := job["name"].(string)
 		jobHosts := job["hosts"].([]any)
 		for _, host := range jobHosts {
 			client, ok := clients[host.(string)]
 			if !ok {
 				return fmt.Errorf("host '%s' does not exist", host)
 			}
-			ctx := context.NewPluginContext(name, client, e.Log)
+			ctx := context.NewPluginContext(jobName, client, e.Log)
 
-			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", name, host))
+			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
 
 			err := e.ExecuteJob(job, ctx)
 			if err != nil {
@@ -61,7 +65,7 @@ func (e *Executor) ExecuteJobs() error {
 func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error {
 	for key, value := range job {
 		// Skip keys that are not plugins
-		if key == "hosts" {
+		if key == "hosts" || key == "name" {
 			continue
 		}
 
@@ -70,7 +74,13 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 			return fmt.Errorf("error: plugin '%s' does not exist", key)
 		}
 
-		plg.Execute(value.(string), ctx)
+		output, err := plg.Execute(value.(string), ctx)
+		if err != nil {
+			return err
+		}
+		if output != "" {
+			e.Log(fmt.Sprintf("Job output: %s", output))
+		}
 	}
 
 	return nil
@@ -78,13 +88,4 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 
 func (e *Executor) Log(data string) {
 	logging.LogOut(data)
-
-	if e.outputChannel != nil {
-		select {
-		case e.outputChannel <- logging.Log(data):
-			break
-		default:
-			break
-		}
-	}
 }
