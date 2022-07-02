@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// TODO: refactor this
+
 func generateString(data string) string {
 	dt := time.Now()
 

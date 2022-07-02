@@ -3,31 +3,45 @@ package remote
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"golang.org/x/crypto/ssh"
 )
 
 type Client struct {
-	name      string
-	sshClient *ssh.Client
+	name        string
+	sshClient   *ssh.Client
+	isLocalhost bool
 }
 
 func (c *Client) ExecuteCommand(command string) (string, error) {
-	if c.sshClient == nil {
+	if c.sshClient == nil && !c.isLocalhost {
 		err := fmt.Errorf("error: client is not created")
 		fmt.Println(logging.Log(err.Error()))
 		return "", err
 	}
 
-	session, err := c.sshClient.NewSession()
-	if err != nil {
-		fmt.Println(logging.Log(err.Error()))
-		return "", err
-	}
-	defer session.Close()
+	// If the client is remote (SSH)
+	if !c.isLocalhost {
+		session, err := c.sshClient.NewSession()
+		if err != nil {
+			fmt.Println(logging.Log(err.Error()))
+			return "", err
+		}
+		defer session.Close()
 
-	output, err := session.Output(command)
+		output, err := session.Output(command)
+		if err != nil {
+			fmt.Println(logging.Log(err.Error()))
+			return "", err
+		}
+
+		return string(output), nil
+	}
+
+	cmd := exec.Command("sh", "-c", command)
+	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println(logging.Log(err.Error()))
 		return "", err
@@ -44,6 +58,14 @@ func CloseAllClients(clients map[string]*Client) {
 				fmt.Println(logging.Log(fmt.Sprintf("error closing client %s: %s", client.name, err.Error())))
 			}
 		}
+	}
+}
+
+func ConnectToLocalhost() *Client {
+	return &Client{
+		name:        "localhost",
+		sshClient:   nil,
+		isLocalhost: true,
 	}
 }
 
@@ -67,6 +89,7 @@ func ConnectToHost(name, host string, port uint16, connectionType, username, pas
 	client := &Client{
 		name,
 		sshClient,
+		false,
 	}
 
 	return client, nil

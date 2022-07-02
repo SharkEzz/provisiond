@@ -4,8 +4,9 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/remote"
 )
 
+// A JobContext is passed to each executed jobs
 type JobContext struct {
-	jobName string
+	JobName string
 	client  *remote.Client
 	logger  func(data string)
 }

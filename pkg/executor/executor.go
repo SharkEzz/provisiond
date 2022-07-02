@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
@@ -12,8 +13,9 @@ import (
 )
 
 type Executor struct {
-	Deployment *deployment.Deployment
-	UUID       string
+	Deployment     *deployment.Deployment
+	UUID           string
+	logFileCreated bool
 }
 
 func NewExecutor(dployment *deployment.Deployment) *Executor {
@@ -22,6 +24,7 @@ func NewExecutor(dployment *deployment.Deployment) *Executor {
 	return &Executor{
 		dployment,
 		uuid,
+		false,
 	}
 }
 
@@ -43,10 +46,18 @@ func (e *Executor) ExecuteJobs() error {
 		jobName := job["name"].(string)
 		jobHosts := job["hosts"].([]any)
 		for _, host := range jobHosts {
-			client, ok := clients[host.(string)]
-			if !ok {
-				return fmt.Errorf("host '%s' does not exist", host)
+			var client *remote.Client
+
+			if host == "localhost" {
+				client = remote.ConnectToLocalhost()
+			} else {
+				c, ok := clients[host.(string)]
+				if !ok {
+					return fmt.Errorf("host '%s' does not exist", host)
+				}
+				client = c
 			}
+
 			ctx := context.NewPluginContext(jobName, client, e.Log)
 
 			e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
@@ -87,5 +98,21 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 }
 
 func (e *Executor) Log(data string) {
+	logStr := logging.Log(data)
+
+	os.Mkdir(".deployments", 0750)
+	filePath := fmt.Sprintf(".deployments/%s.txt", e.UUID)
+
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+	if err == nil {
+		defer file.Close()
+	}
+
+	if !e.logFileCreated {
+		fmt.Fprintln(file, e.Deployment.Name)
+		e.logFileCreated = true
+	}
+	fmt.Fprintln(file, logStr)
+
 	logging.LogOut(data)
 }
