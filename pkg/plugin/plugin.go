@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SharkEzz/provisiond/pkg/context"
+	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin/internal"
 )
 
@@ -23,22 +24,31 @@ var Plugins = map[string]Plugin{
 	"shell": &internal.Shell{},
 }
 
+// Load all the plugins in ./plugins (relative to the current executable directory)
 func init() {
 	pluginsDir, err := os.ReadDir("./plugins")
 	if err != nil {
 		panic(err)
 	}
 
+	loadCount := 0
+
 	for _, pluginItem := range pluginsDir {
 		pluginName := strings.Split(pluginItem.Name(), ".")[0]
+
+		if !strings.HasSuffix(pluginItem.Name(), ".so") {
+			continue
+		}
+
 		loadedPlugin, err := loadPlugin(fmt.Sprintf("./plugins/%s", pluginItem.Name()))
 		if err != nil {
 			panic(err)
 		}
 		Plugins[pluginName] = loadedPlugin
+		loadCount++
 	}
 
-	fmt.Printf("Loaded %d plugins\n", len(pluginsDir))
+	logging.LogOut(fmt.Sprintf("Loaded %d external plugins, %d plugins in total", loadCount, len(Plugins)))
 }
 
 func loadPlugin(path string) (Plugin, error) {

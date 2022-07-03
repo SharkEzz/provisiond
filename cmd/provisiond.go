@@ -20,7 +20,7 @@ var (
 )
 
 func main() {
-	fmt.Printf("provisiond %s - Compiled on %s\n\n", version, buildTime.Format("2006-01-02 15:04:05"))
+	logging.LogOut(fmt.Sprintf("provisiond %s - Compiled on %s\n", version, buildTime.Format("2006-01-02 15:04:05")))
 
 	flag.Parse()
 
