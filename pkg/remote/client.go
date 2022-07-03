@@ -69,7 +69,7 @@ func ConnectToLocalhost() *Client {
 	}
 }
 
-func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile string) (*Client, error) {
+func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyPass string) (*Client, error) {
 	var sshClient *ssh.Client
 	var err error
 
@@ -77,7 +77,7 @@ func ConnectToHost(name, host string, port uint16, connectionType, username, pas
 	case "password":
 		sshClient, err = connectWithPassword(host, port, username, password)
 	case "key":
-		sshClient, err = connectWithPrivateKey(host, port, username, keyFile)
+		sshClient, err = connectWithPrivateKey(host, port, username, keyFile, keyPass)
 	default:
 		return nil, fmt.Errorf("error: unknown login method '%s'", connectionType)
 	}
@@ -113,15 +113,24 @@ func connectWithPassword(host string, port uint16, username, password string) (*
 	return client, nil
 }
 
-func connectWithPrivateKey(host string, port uint16, username, keyFile string) (*ssh.Client, error) {
+func connectWithPrivateKey(host string, port uint16, username, keyFile, keyPass string) (*ssh.Client, error) {
 	keyFileContent, err := os.ReadFile(keyFile)
 	if err != nil {
 		return nil, err
 	}
 
-	signer, err := ssh.ParsePrivateKey(keyFileContent)
-	if err != nil {
-		return nil, err
+	var signer ssh.Signer
+
+	if keyPass != "" {
+		signer, err = ssh.ParsePrivateKeyWithPassphrase(keyFileContent, []byte(keyPass))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		signer, err = ssh.ParsePrivateKey(keyFileContent)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	sshConfig := &ssh.ClientConfig{

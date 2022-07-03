@@ -8,6 +8,7 @@ type SSHConfig struct {
 	Username string
 	Password string
 	KeyFile  string
+	KeyPass  string
 }
 
 // A deployment is the configuration file that contain all the instructions to deploy your project.
