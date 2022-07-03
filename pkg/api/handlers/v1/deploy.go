@@ -42,6 +42,5 @@ func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
 
 	utils.ReturnJson(map[string]any{
 		"success": true,
-		"uuid":    executr.UUID,
 	}, w)
 }

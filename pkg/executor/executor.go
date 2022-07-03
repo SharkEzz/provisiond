@@ -2,28 +2,23 @@ package executor
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
 	"github.com/SharkEzz/provisiond/pkg/remote"
-	"github.com/google/uuid"
 )
 
 type Executor struct {
 	Deployment     *deployment.Deployment
-	UUID           string
 	logFileCreated bool
 }
 
 func NewExecutor(dployment *deployment.Deployment) *Executor {
-	uuid := uuid.NewString()
 
 	return &Executor{
 		dployment,
-		uuid,
 		false,
 	}
 }
@@ -98,21 +93,22 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 }
 
 func (e *Executor) Log(data string) {
-	logStr := logging.Log(data)
+	// TODO: re-enable file logging
+	// logStr := logging.Log(data)
 
-	os.Mkdir(".deployments", 0750)
-	filePath := fmt.Sprintf(".deployments/%s.txt", e.UUID)
+	// os.Mkdir(".deployments", 0750)
+	// filePath := fmt.Sprintf(".deployments/%s.txt", e.UUID)
 
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
-	if err == nil {
-		defer file.Close()
-	}
+	// file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+	// if err == nil {
+	// 	defer file.Close()
+	// }
 
-	if !e.logFileCreated {
-		fmt.Fprintln(file, e.Deployment.Name)
-		e.logFileCreated = true
-	}
-	fmt.Fprintln(file, logStr)
+	// if !e.logFileCreated {
+	// 	fmt.Fprintln(file, e.Deployment.Name)
+	// 	e.logFileCreated = true
+	// }
+	// fmt.Fprintln(file, logStr)
 
 	logging.LogOut(data)
 }

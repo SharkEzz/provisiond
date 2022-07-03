@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/SharkEzz/provisiond/pkg/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
@@ -11,12 +12,16 @@ import (
 )
 
 var (
+	buildTime   = time.Now()
+	version     = "dev"
 	file        = flag.String("file", "", "The path to the configuration file to execute")
 	enableAPI   = flag.Bool("api", false, "Set to true to enable the integrated REST API")
 	apiPassword = flag.String("apiPassword", "", "The REST API password")
 )
 
 func main() {
+	fmt.Printf("provisiond %s - Compiled on %s", version, buildTime.Format("2006-01-02 15:04:05"))
+
 	flag.Parse()
 
 	if *enableAPI {
