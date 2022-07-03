@@ -6,7 +6,7 @@ BUILD_TAG = $(shell git describe --tags --abbrev=0)
 build: $(BUILD_DIR)/$(APP_NAME)
 
 $(BUILD_DIR)/$(APP_NAME):
-	go build -trimpath -ldflags="-X 'main.version=$(BUILD_TAG)" -o $(BUILD_DIR)/$(APP_NAME) ./cmd/provisiond.go
+	go build -trimpath -ldflags="-X 'main.version=$(BUILD_TAG)'" -o $(BUILD_DIR)/$(APP_NAME) ./cmd/provisiond.go
 
 .PHONY: clean
 clean:
