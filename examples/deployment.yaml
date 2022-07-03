@@ -1,0 +1,43 @@
+name: Deployment
+
+variables:
+  TEST_STRING: test
+  TEST_NUMBER: 125
+  TEST_FLOAT: 1.52
+
+config:
+  ssh:
+    vps1:
+      host: 127.0.0.1
+      port: 22
+      type: password
+      username: user
+      password: password
+
+    vps2:
+      host: 127.0.0.1
+      port: 22
+      type: key
+      keyFile: ./private.key
+      keyPass: password
+
+jobs:
+  - name: Test1
+    hosts: [vps1, localhost]
+    shell: echo ${TEST_NUMBER} > test.txt
+
+  - name: Test1 cat
+    hosts: [vps2, vps1, localhost]
+    shell: cat test.txt
+
+  - name: Test2
+    hosts:
+      - localhost
+    shell: echo ${TEST_STRING} > test2.txt
+
+  - name: Clean
+    hosts:
+      - vps1
+      - vps2
+    shell: |
+      rm test*
