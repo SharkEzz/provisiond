@@ -22,6 +22,7 @@ type Plugin interface {
 // whoses names must be the same as the ones used in the deployment file.
 var Plugins = map[string]Plugin{
 	"shell": &plugin.Shell{},
+	"file":  &plugin.File{},
 }
 
 // Load all the plugins in ./plugins (relative to the current executable directory)

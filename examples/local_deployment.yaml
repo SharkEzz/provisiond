@@ -19,6 +19,20 @@ jobs:
       - localhost
     shell: echo ${TEST_STRING} > test2.txt
 
+  - name: Test file
+    hosts:
+      - localhost
+    file:
+      action: create
+      path: test_toto.txt
+
+  - name: Test file exist
+    hosts:
+      - localhost
+    file:
+      action: exist
+      path: test_toto.txt
+
   - name: Clean
     hosts:
       - localhost

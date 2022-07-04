@@ -4,9 +4,9 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/SharkEzz/provisiond/pkg/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
-	"github.com/SharkEzz/provisiond/pkg/utils"
 )
 
 func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {

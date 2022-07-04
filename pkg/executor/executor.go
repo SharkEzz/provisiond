@@ -79,7 +79,7 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 			return fmt.Errorf("error: plugin '%s' does not exist", key)
 		}
 
-		output, err := plg.Execute(value.(string), ctx)
+		output, err := plg.Execute(value, ctx)
 		if err != nil {
 			return err
 		}
