@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/SharkEzz/provisiond/pkg/remote"
+	"github.com/SharkEzz/provisiond/internal/remote"
 )
 
 // A JobContext is passed to each executed jobs

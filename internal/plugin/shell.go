@@ -1,4 +1,4 @@
-package internal
+package plugin
 
 import "github.com/SharkEzz/provisiond/pkg/context"
 

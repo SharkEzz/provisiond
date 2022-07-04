@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SharkEzz/provisiond/pkg/api"
+	"github.com/SharkEzz/provisiond/internal/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
 	"github.com/SharkEzz/provisiond/pkg/logging"

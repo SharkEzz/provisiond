@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/SharkEzz/provisiond/pkg/deployment"
+	"github.com/SharkEzz/provisiond/pkg/utils"
 )
 
 // FileLoader load a deployment configuration from a file.
@@ -15,5 +16,5 @@ func (f FileLoader) Load() (*deployment.Deployment, error) {
 		return nil, err
 	}
 
-	return parseYAML(content)
+	return utils.ParseYAML(content)
 }

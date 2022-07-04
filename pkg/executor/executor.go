@@ -3,11 +3,11 @@ package executor
 import (
 	"fmt"
 
+	"github.com/SharkEzz/provisiond/internal/remote"
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
-	"github.com/SharkEzz/provisiond/pkg/remote"
 )
 
 type Executor struct {
@@ -16,7 +16,6 @@ type Executor struct {
 }
 
 func NewExecutor(dployment *deployment.Deployment) *Executor {
-
 	return &Executor{
 		dployment,
 		false,

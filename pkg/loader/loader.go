@@ -1,11 +1,10 @@
 package loader
 
 import (
-	"os"
 	"strings"
 
+	"github.com/SharkEzz/provisiond/internal/loader"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
-	"gopkg.in/yaml.v3"
 )
 
 // The Loader interface represent a custom loader for loading a deployment configuration.
@@ -17,44 +16,8 @@ type Loader interface {
 func GetLoader(name string) Loader {
 	// If the name is multiline, treat it as a string
 	if len(strings.Split(name, "\n")) > 1 {
-		return StringLoader(name)
+		return loader.StringLoader(name)
 	}
 
-	return FileLoader(name)
-}
-
-// parseYaml expand all the variables found then parse the entire configuration file.
-func parseYAML(content []byte) (*deployment.Deployment, error) {
-	type variables struct {
-		Variables map[string]string
-	}
-	vars := &variables{}
-	err := yaml.Unmarshal(content, vars)
-	if err != nil {
-		return nil, err
-	}
-
-	for name, value := range vars.Variables {
-		err = os.Setenv(name, value)
-		if err != nil {
-			return nil, err
-		}
-	}
-	content = []byte(os.ExpandEnv(string(content)))
-
-	// Prevent leaking of environment variables by unsetting them after expanding
-	for name := range vars.Variables {
-		err = os.Unsetenv(name)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	deployment := &deployment.Deployment{}
-	err = yaml.Unmarshal(content, deployment)
-	if err != nil {
-		return nil, err
-	}
-
-	return deployment, err
+	return loader.FileLoader(name)
 }

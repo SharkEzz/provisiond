@@ -6,9 +6,9 @@ import (
 	goPlugin "plugin"
 	"strings"
 
+	"github.com/SharkEzz/provisiond/internal/plugin"
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/logging"
-	"github.com/SharkEzz/provisiond/pkg/plugin/internal"
 )
 
 // The Plugin interface define one method,
@@ -21,11 +21,16 @@ type Plugin interface {
 // The Plugins map contain all the registered plugins,
 // whoses names must be the same as the ones used in the deployment file.
 var Plugins = map[string]Plugin{
-	"shell": &internal.Shell{},
+	"shell": &plugin.Shell{},
 }
 
 // Load all the plugins in ./plugins (relative to the current executable directory)
 func init() {
+	// Do not attempt to load plugins if the plugins folder does not exist
+	if _, err := os.Stat("./plugins"); os.IsNotExist(err) {
+		return
+	}
+
 	pluginsDir, err := os.ReadDir("./plugins")
 	if err != nil {
 		panic(err)

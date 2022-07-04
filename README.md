@@ -123,6 +123,8 @@ The `Plugin` plugin interface only define one method: `Execute`, which take 2 pa
 - ctx : type `JobContext`
     - It contains the methods to interact with the targeted system
 
+The builded plugins must be in a `plugins` folder, in the same directory as the provisiond executable.
+
 Check the example in the `pkg/plugin/example` folder.
 
 ## Roadmap

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	v1 "github.com/SharkEzz/provisiond/pkg/api/handlers/v1"
+	v1 "github.com/SharkEzz/provisiond/internal/api/handlers/v1"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 )
 
