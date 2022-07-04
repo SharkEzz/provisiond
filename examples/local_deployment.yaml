@@ -24,14 +24,14 @@ jobs:
       - localhost
     file:
       action: create
-      path: test_toto.txt
+      path: test_file.txt
 
   - name: Test file exist
     hosts:
       - localhost
     file:
       action: exist
-      path: test_toto.txt
+      path: test_file.txt
 
   - name: Clean
     hosts:

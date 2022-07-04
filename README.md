@@ -117,20 +117,51 @@ jobs:
 The name and the hosts are the 2 basic required components.
 provisiond use a system of plugins, each of them is identified by their name.
 
-Currently, there is only a `shell` plugin (expect more to come).
+##### Shell
 It only take a string which is the command to run.
 
 ```yaml
-    shell: echo Hello from deployment > hello.txt
+  shell: echo Hello from deployment > hello.txt
 ```
 
 ```yaml
     shell: |
-        echo multiline command
-        cat /dev/zero
+      echo multiline command
+      cat /dev/zero
 ```
 
 If the command output something, you will see it in the terminal where provisiond is ran.
+
+##### File
+
+The file plugin allow you to interact with files easily.
+
+- Create
+  ```yaml
+    file:
+      action: create
+      path: path_to_the_file.txt
+      content: |
+        content of the file (can be single of multiline)
+  ```
+
+- Exist
+  
+  The exist action assert that a file exist, if it does not, abort the deployment (there is no way to allow it to fail for now)
+  ```yaml
+    file:
+      action: exist
+      path: path_to_the_file.txt
+  ```
+
+- Delete
+
+  As is name say, this action allow to delete a specific file (multiple file support is coming!)
+  ```yaml
+    file:
+      delete: delete
+      path: path_to_the_file.txt
+  ```
 
 ### Examples
 
