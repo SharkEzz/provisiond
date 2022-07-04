@@ -10,6 +10,30 @@
 
 ## How to use ?
 
+### Executing a deployment
+
+#### CLI
+
+This is the most simple way to use provisiond, simply launch the executable with the flag `-file` followed by the relative or absolute path to the deployment file.
+
+```
+./provisiond -file deployment.yaml
+```
+
+#### REST API
+
+The REST API allow you to trigger deployments remotely.
+
+You have to provide the flags `-api` and `-apiPassword`. The `apiPassword` must be followed by a string that will allow accessing the API.
+
+```
+./provisiond -api -apiPassword password
+```
+
+Aditionally, you can provide the flag `-apiPort` followed by the port you want to listen (must be an integer between 0 and 65536).
+
+By default, the API will be available on `0.0.0.0:7655`.
+
 ### Writing a deployment file
 
 A deployment file consist in 4 parts:

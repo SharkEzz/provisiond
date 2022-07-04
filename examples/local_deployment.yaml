@@ -1,0 +1,26 @@
+name: Deployment
+
+variables:
+  TEST_STRING: test
+  TEST_NUMBER: 125
+  TEST_FLOAT: 1.52
+
+jobs:
+  - name: Test1
+    hosts: [localhost]
+    shell: echo ${TEST_NUMBER} > test.txt
+
+  - name: Test1 cat
+    hosts: [localhost]
+    shell: cat test.txt
+
+  - name: Test2
+    hosts:
+      - localhost
+    shell: echo ${TEST_STRING} > test2.txt
+
+  - name: Clean
+    hosts:
+      - localhost
+    shell: |
+      rm test*

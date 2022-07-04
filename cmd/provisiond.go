@@ -17,6 +17,7 @@ var (
 	file        = flag.String("file", "", "The path to the configuration file to execute")
 	enableAPI   = flag.Bool("api", false, "Set to true to enable the integrated REST API")
 	apiPassword = flag.String("apiPassword", "", "The REST API password")
+	apiPort     = flag.Uint("apiPort", 7655, "The port to listen on for the REST API")
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 		if *apiPassword == "" {
 			fmt.Println(logging.Log("apiPassword cannot be blank"))
 		}
-		api.StartAPI("0.0.0.0", 7655, *apiPassword)
+		api.StartAPI("0.0.0.0", uint16(*apiPort), *apiPassword)
 		return
 	}
 
