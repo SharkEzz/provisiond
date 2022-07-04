@@ -117,6 +117,13 @@ jobs:
 The name and the hosts are the 2 basic required components.
 provisiond use a system of plugins, each of them is identified by their name.
 
+You can mark a job as allowed to fail, it means that even if the job return an error, it will be ignored and the rest of the deployment will be executed. By default, all jobs are not allowed to fail unless stated explicitly.
+
+To allow a job to fail, add this key to the job:
+```yaml
+    allow_failure: true
+```
+
 ##### Shell
 It only take a string which is the command to run.
 
@@ -125,9 +132,9 @@ It only take a string which is the command to run.
 ```
 
 ```yaml
-    shell: |
-      echo multiline command
-      cat /dev/zero
+  shell: |
+    echo multiline command
+    cat /dev/zero
 ```
 
 If the command output something, you will see it in the terminal where provisiond is ran.

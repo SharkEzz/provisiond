@@ -31,7 +31,7 @@ func (s *File) Execute(data any, ctx *context.JobContext) (string, error) {
 		}
 	case "exist":
 		if _, err := os.Stat(fileData.Path); os.IsNotExist(err) {
-			return "", fmt.Errorf("error: file %s does not exist, aborting", fileData.Path)
+			return "", fmt.Errorf("error: file %s does not exist", fileData.Path)
 		}
 	case "delete":
 		err := os.Remove(fileData.Path)

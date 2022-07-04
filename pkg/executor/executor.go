@@ -70,7 +70,9 @@ func (e *Executor) ExecuteJobs() error {
 func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error {
 	for key, value := range job {
 		// Skip keys that are not plugins
-		if key == "hosts" || key == "name" {
+		if key == "hosts" ||
+			key == "name" ||
+			key == "allow_failure" {
 			continue
 		}
 
@@ -81,7 +83,11 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 
 		output, err := plg.Execute(value, ctx)
 		if err != nil {
-			return err
+			if allowedToFail, ok := job["allow_failure"].(bool); ok && allowedToFail {
+				e.Log(fmt.Sprintf("Job %s failed but failure allowed: %s", job["name"], err))
+			} else {
+				return err
+			}
 		}
 		if output != "" {
 			e.Log(fmt.Sprintf("Job output: %s", output))

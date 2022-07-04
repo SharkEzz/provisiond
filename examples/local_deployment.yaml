@@ -29,6 +29,7 @@ jobs:
   - name: Test file exist
     hosts:
       - localhost
+    allow_failure: true
     file:
       action: exist
       path: test_file.txt
