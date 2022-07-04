@@ -7,11 +7,6 @@ import (
 )
 
 func (a *API) HandleGetHealthcheck(w http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	utils.ReturnJson(map[string]any{
 		"result": "ok",
 	}, w)

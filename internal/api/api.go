@@ -30,7 +30,7 @@ func StartAPI(host string, port uint16, password string) {
 	healthcheckHandler := http.HandlerFunc(handlers.HandleGetHealthcheck)
 	deployHandler := http.HandlerFunc(handlers.HandlePostDeploy)
 
-	http.Handle("/v1/healthcheck", checkPassword(healthcheckHandler))
+	http.Handle("/v1/healthcheck", healthcheckHandler)
 	http.Handle("/v1/deploy", checkPassword(deployHandler))
 
 	logging.LogOut("Started API server")
