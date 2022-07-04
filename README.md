@@ -195,3 +195,9 @@ The builded plugins must be in a `plugins` folder, in the same directory as the 
 Check the example in the `pkg/plugin/example` folder.
 
 ## Roadmap
+
+- Add tests
+- Launch jobs in goroutines (allow for supervision, timeout, cancels, etc...)
+- Clean TODOS
+- Dashboard :eyes:
+- Online documentation
