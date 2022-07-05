@@ -4,7 +4,7 @@ import "encoding/json"
 
 // ConvertToType is a generic function, it take any data then convert them to a pointer of type T.
 func ConvertToType[T any](data any) (*T, error) {
-	jsonStr, err := json.Marshal(data.(map[string]any))
+	jsonStr, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}

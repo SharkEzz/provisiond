@@ -39,7 +39,7 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 			}
 		}
 
-		// err can be *exec.ExitError
+		// err can be *ssh.ExitError
 		output, err := session.Output(command)
 		if err != nil {
 			fmt.Println(logging.Log(err.Error()))

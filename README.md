@@ -154,7 +154,7 @@ The file plugin allow you to interact with files easily.
 
 - Exist
   
-  The exist action assert that a file exist, if it does not, abort the deployment (there is no way to allow it to fail for now)
+  The exist action assert that a file exist, if it does not, throw an error
   ```yaml
     file:
       action: exist
