@@ -11,14 +11,12 @@ import (
 )
 
 type Executor struct {
-	Deployment     *deployment.Deployment
-	logFileCreated bool
+	Deployment *deployment.Deployment
 }
 
 func NewExecutor(dployment *deployment.Deployment) *Executor {
 	return &Executor{
 		dployment,
-		false,
 	}
 }
 
@@ -28,7 +26,7 @@ func (e *Executor) ExecuteJobs() error {
 	clients := map[string]*remote.Client{}
 
 	for name, config := range e.Deployment.Config.SSH {
-		client, err := remote.ConnectToHost(name, config.Host, config.Port, config.Type, config.Username, config.Password, config.KeyFile, config.KeyPass)
+		client, err := remote.ConnectToHost(name, config.Host, config.Port, config.Type, config.Username, config.Password, config.KeyFile, config.KeyPass, e.Deployment.Variables)
 		if err != nil {
 			return err
 		}

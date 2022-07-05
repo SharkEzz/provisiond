@@ -12,6 +12,7 @@ import (
 type Client struct {
 	name        string
 	sshClient   *ssh.Client
+	variables   map[string]string
 	isLocalhost bool
 }
 
@@ -31,6 +32,14 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 		}
 		defer session.Close()
 
+		for name, value := range c.variables {
+			err := session.Setenv(name, value)
+			if err != nil {
+				return "", fmt.Errorf("error while setting %s variable", name)
+			}
+		}
+
+		// err can be *exec.ExitError
 		output, err := session.Output(command)
 		if err != nil {
 			fmt.Println(logging.Log(err.Error()))
@@ -69,7 +78,7 @@ func ConnectToLocalhost() *Client {
 	}
 }
 
-func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyPass string) (*Client, error) {
+func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyPass string, variables map[string]string) (*Client, error) {
 	var sshClient *ssh.Client
 	var err error
 
@@ -89,6 +98,7 @@ func ConnectToHost(name, host string, port uint16, connectionType, username, pas
 	client := &Client{
 		name,
 		sshClient,
+		variables,
 		false,
 	}
 

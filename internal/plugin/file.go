@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/utils"
@@ -25,16 +24,17 @@ func (s *File) Execute(data any, ctx *context.JobContext) (string, error) {
 
 	switch fileData.Action {
 	case "create":
-		err := os.WriteFile(fileData.Path, []byte(fileData.Content), 0644)
+		_, err := ctx.ExecuteCommand(fmt.Sprintf("echo %s > %s", fileData.Content, fileData.Path))
 		if err != nil {
 			return "", err
 		}
 	case "exist":
-		if _, err := os.Stat(fileData.Path); os.IsNotExist(err) {
+		_, err := ctx.ExecuteCommand(fmt.Sprintf("test -e %s", fileData.Path))
+		if err != nil {
 			return "", fmt.Errorf("error: file %s does not exist", fileData.Path)
 		}
 	case "delete":
-		err := os.Remove(fileData.Path)
+		_, err := ctx.ExecuteCommand(fmt.Sprintf("rm -f %s", fileData.Path))
 		if err != nil {
 			return "", err
 		}
