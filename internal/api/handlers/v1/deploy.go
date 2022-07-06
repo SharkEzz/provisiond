@@ -34,8 +34,7 @@ func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: implement executor configuration
-	exec := executor.NewExecutor(cfg, nil)
+	exec := executor.NewExecutor(cfg, a.Config)
 
 	// TODO: stream the output to the client
 

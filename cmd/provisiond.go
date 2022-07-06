@@ -27,23 +27,6 @@ func main() {
 
 	flag.Parse()
 
-	if *enableAPI {
-		if *apiPassword == "" {
-			panic(fmt.Errorf("apiPassword is required when enabling the API"))
-		}
-		api.StartAPI("0.0.0.0", uint16(*apiPort), *apiPassword)
-		return
-	}
-
-	if *file == "" {
-		panic(fmt.Errorf("file cannot be null"))
-	}
-
-	deployment, err := loader.GetLoader(*file).Load()
-	if err != nil {
-		panic(err)
-	}
-
 	var config *executor.Config
 
 	if _, err := os.Stat("./config.yaml"); err == nil {
@@ -56,6 +39,23 @@ func main() {
 			panic(err)
 		}
 		logging.LogOut("Loaded config from ./config.yaml")
+	}
+
+	if *enableAPI {
+		if *apiPassword == "" {
+			panic(fmt.Errorf("apiPassword is required when enabling the API"))
+		}
+		api.NewAPI("0.0.0.0", uint16(*apiPort), *apiPassword, config).StartAPI()
+		return
+	}
+
+	if *file == "" {
+		panic(fmt.Errorf("file cannot be null"))
+	}
+
+	deployment, err := loader.GetLoader(*file).Load()
+	if err != nil {
+		panic(err)
 	}
 
 	err = executor.NewExecutor(deployment, config).ExecuteJobs()

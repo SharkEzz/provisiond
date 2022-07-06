@@ -212,7 +212,7 @@ provisiond use the [plugin system from Go](https://pkg.go.dev/plugin) to load ex
 
 > A plugin **MUST** export a function with this signature : `GetPlugin() (p any)`, which will return an instance of newly created the plugin
 
-The `Plugin` plugin interface only define one method: `Execute`, which take 2 parameters:
+The `Plugin` interface only define one method: `Execute`, which take 2 parameters:
 - data : type `any`
     - This is the data received from the deployment file
 - ctx : type `JobContext`

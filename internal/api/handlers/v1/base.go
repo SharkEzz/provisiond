@@ -1,3 +1,7 @@
 package v1
 
-type API struct{}
+import "github.com/SharkEzz/provisiond/pkg/executor"
+
+type API struct {
+	Config *executor.Config
+}
