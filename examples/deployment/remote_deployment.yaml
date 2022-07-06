@@ -23,16 +23,16 @@ config:
 
 jobs:
   - name: Test1
-    hosts: [vps1, localhost]
+    hosts: [vps1]
     shell: echo ${TEST_NUMBER} > test.txt
 
   - name: Test1 cat
-    hosts: [vps2, vps1, localhost]
+    hosts: [vps2, vps1]
     shell: cat test.txt
 
   - name: Test2
     hosts:
-      - localhost
+      - vps2
     shell: echo ${TEST_STRING} > test2.txt
 
   - name: Clean

@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/SharkEzz/provisiond/pkg/api"
+	utils "github.com/SharkEzz/provisiond/pkg/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
 )
@@ -34,10 +34,13 @@ func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	executr := executor.NewExecutor(cfg)
+	// TODO: implement executor configuration
+	exec := executor.NewExecutor(cfg, nil)
+
+	// TODO: stream the output to the client
 
 	go func() {
-		executr.ExecuteJobs()
+		exec.ExecuteJobs()
 	}()
 
 	utils.ReturnJson(map[string]any{

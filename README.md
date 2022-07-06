@@ -170,6 +170,34 @@ The file plugin allow you to interact with files easily.
       path: path_to_the_file.txt
   ```
 
+### Configuration
+
+> The configuration is currently only supported when executing provisiond from the CLI, not from the REST API
+
+provisiond allow you to define global configuration for your deployments.
+
+As of now, a very little options are configurable globally:
+- Job timeout
+- Deployment timeout
+- Allow job failure
+
+This options are written in a configuration file named `config.yaml`, this file must be in the same folder as the provisiond executable.
+
+Example:
+
+Examples can be found in the `/examples/config` folder.
+
+```yaml
+job_timeout: 60
+deployment_timeout: 120
+allow_failure: false
+```
+
+Here, we set a job timeout of 60 seconds, a deployment timeout of 120 seconds and disallow job failure.
+
+Please note that all the timeout numbers are in seconds, and if the `config.yaml` file is present, you must define all the options yourself.
+By default, the job timeout is set to one hour, the deployment timeout to 1 day and the jobs are not allowed to fail.
+
 ### Examples
 
 You can check the example files in the current repo (in examples folders).

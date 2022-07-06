@@ -3,12 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/SharkEzz/provisiond/internal/api"
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
 	"github.com/SharkEzz/provisiond/pkg/logging"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -27,7 +29,7 @@ func main() {
 
 	if *enableAPI {
 		if *apiPassword == "" {
-			fmt.Println(logging.Log("apiPassword cannot be blank"))
+			panic(fmt.Errorf("apiPassword is required when enabling the API"))
 		}
 		api.StartAPI("0.0.0.0", uint16(*apiPort), *apiPassword)
 		return
@@ -37,12 +39,26 @@ func main() {
 		panic(fmt.Errorf("file cannot be null"))
 	}
 
-	cfg, err := loader.GetLoader(*file).Load()
+	deployment, err := loader.GetLoader(*file).Load()
 	if err != nil {
 		panic(err)
 	}
 
-	err = executor.NewExecutor(cfg).ExecuteJobs()
+	var config *executor.Config
+
+	if _, err := os.Stat("./config.yaml"); err == nil {
+		content, err := os.ReadFile("./config.yaml")
+		if err != nil {
+			panic(err)
+		}
+		err = yaml.Unmarshal(content, &config)
+		if err != nil {
+			panic(err)
+		}
+		logging.LogOut("Loaded config from ./config.yaml")
+	}
+
+	err = executor.NewExecutor(deployment, config).ExecuteJobs()
 	if err != nil {
 		panic(err)
 	}
