@@ -1,6 +1,9 @@
 package v1
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -34,15 +37,33 @@ func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	exec := executor.NewExecutor(cfg, a.Config)
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Connection", "keep-alive")
 
-	// TODO: stream the output to the client
+	running := true
+	ended := make(chan bool, 1)
+	logChannel := make(chan string)
+
+	exec := executor.NewExecutor(cfg, a.Config, logChannel)
 
 	go func() {
 		exec.ExecuteJobs()
+		ended <- true
 	}()
 
-	utils.ReturnJson(map[string]any{
-		"success": true,
-	}, w)
+	for running {
+		select {
+		case log := <-logChannel:
+			var buf bytes.Buffer
+			json.NewEncoder(&buf).Encode(log)
+			fmt.Fprintf(w, "data: %s\n", buf.String())
+		case <-ended:
+			running = false
+		}
+
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+	}
 }

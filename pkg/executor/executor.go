@@ -20,9 +20,10 @@ type Config struct {
 type Executor struct {
 	Deployment *deployment.Deployment
 	Config     *Config
+	logChannel chan string
 }
 
-func NewExecutor(dpl *deployment.Deployment, cfg *Config) *Executor {
+func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) *Executor {
 	if cfg == nil {
 		cfg = &Config{
 			JobTimeout:        3600,
@@ -34,6 +35,7 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config) *Executor {
 	return &Executor{
 		dpl,
 		cfg,
+		logChannel,
 	}
 }
 
@@ -159,6 +161,10 @@ func (e *Executor) Log(data string) {
 	// 	e.logFileCreated = true
 	// }
 	// fmt.Fprintln(file, logStr)
+
+	if e.logChannel != nil {
+		e.logChannel <- logging.Log(data)
+	}
 
 	logging.LogOut(data)
 }
