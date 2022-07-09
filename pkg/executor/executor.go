@@ -25,6 +25,7 @@ type Executor struct {
 	Config     *Config
 	logChannel chan string
 	UUID       string
+	logFile    *os.File
 }
 
 func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) (*Executor, error) {
@@ -41,11 +42,19 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 		return nil, err
 	}
 
+	filePath := fmt.Sprintf("logs/deployments/%s.log", randId.String())
+
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Executor{
 		dpl,
 		cfg,
 		logChannel,
 		randId.String(),
+		file,
 	}, nil
 }
 
@@ -165,14 +174,7 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 func (e *Executor) Log(data string) {
 	logStr := logging.Log(data)
 
-	filePath := fmt.Sprintf("logs/deployments/%s.log", e.UUID)
-
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
-	if err == nil {
-		defer file.Close()
-	}
-
-	fmt.Fprintln(file, logStr)
+	fmt.Fprintln(e.logFile, logStr)
 
 	if e.logChannel != nil {
 		e.logChannel <- logStr
