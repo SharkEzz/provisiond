@@ -31,8 +31,8 @@ type Executor struct {
 func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) (*Executor, error) {
 	if cfg == nil {
 		cfg = &Config{
-			JobTimeout:        3600,
-			DeploymentTimeout: 86400,
+			JobTimeout:        3600,  // 1 hour
+			DeploymentTimeout: 86400, // 1 day
 			AllowFailure:      false,
 		}
 	}
@@ -43,7 +43,6 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 	}
 
 	filePath := fmt.Sprintf("logs/deployments/%s.log", randId.String())
-
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
 	if err != nil {
 		return nil, err
@@ -85,7 +84,7 @@ func (e *Executor) ExecuteJobs() error {
 
 		for _, job := range e.Deployment.Jobs {
 			select {
-			// Prevent the deployment gorouting from running other jobs if deployment is cancelled
+			// Prevent the deployment goroutine from running other jobs if deployment is cancelled
 			case <-deploymentContext.Done():
 				return
 			default:
@@ -98,15 +97,10 @@ func (e *Executor) ExecuteJobs() error {
 				if host == "localhost" {
 					client = remote.ConnectToLocalhost()
 				} else {
-					hostStr, ok := host.(string)
+					c, ok := clients[host.(string)]
 					if !ok {
-						errorChannel <- fmt.Errorf("error: host '%s' is not a string", host)
-						continue
-					}
-					c, ok := clients[hostStr]
-					if !ok {
-						errorChannel <- fmt.Errorf("error: host '%s' does not exist", hostStr)
-						continue
+						errorChannel <- fmt.Errorf("error: host %#v does not exist", host)
+						return
 					}
 					client = c
 				}
