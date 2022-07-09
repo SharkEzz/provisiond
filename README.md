@@ -34,10 +34,11 @@ Aditionally, you can provide the flag `-apiPort` followed by the port you want t
 
 By default, the API will be available on `0.0.0.0:7655`.
 
-There is currently 2 routes available:
+There is currently 3 routes available:
   - `/v1/healthcheck`: will return a 200 response code and a JSON body with `{ 'result': 'ok' }`
   - `/v1/deploy`: this route is POST only, you must provide a header named `password` with the choosen password as the value.
   The body of the request must be a deployment file content in plain text.
+  - `/v1/deploy/log?id=xxx` : this is a GET route only. It take a query parameter `id`, which is equal to the ID provided when you launched the deployment.
 
 ### Writing a deployment file
 

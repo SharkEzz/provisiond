@@ -156,16 +156,14 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 func (e *Executor) Log(data string) {
 	logStr := logging.Log(data)
 
-	go func() {
-		filePath := fmt.Sprintf("logs/deployments/%s.log", e.UUID)
+	filePath := fmt.Sprintf("logs/deployments/%s.log", e.UUID)
 
-		file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
-		if err == nil {
-			defer file.Close()
-		}
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+	if err == nil {
+		defer file.Close()
+	}
 
-		fmt.Fprintln(file, logStr)
-	}()
+	fmt.Fprintln(file, logStr)
 
 	if e.logChannel != nil {
 		e.logChannel <- logStr
