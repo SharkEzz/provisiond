@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"golang.org/x/crypto/ssh"
@@ -49,7 +50,18 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 		return string(output), nil
 	}
 
-	cmd := exec.Command("sh", "-c", command)
+	var cmd *exec.Cmd
+
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/C", command)
+	} else {
+		shell := os.Getenv("SHELL")
+		if shell == "" {
+			shell = "sh"
+		}
+		cmd = exec.Command(shell, "-c", command)
+	}
+
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println(logging.Log(err.Error()))
@@ -90,7 +102,6 @@ func ConnectToHost(name, host string, port uint16, connectionType, username, pas
 	default:
 		return nil, fmt.Errorf("error: unknown login method '%s'", connectionType)
 	}
-
 	if err != nil {
 		return nil, err
 	}
