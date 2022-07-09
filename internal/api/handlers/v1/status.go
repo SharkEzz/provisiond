@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	utils "github.com/SharkEzz/provisiond/pkg/api"
+	utils "github.com/SharkEzz/provisiond/pkg/utils"
 )
 
 func (a *API) HandleGetDeploymentStatus(w http.ResponseWriter, req *http.Request) {

@@ -14,12 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Config struct {
-	JobTimeout        uint32 `yaml:"job_timeout"`
-	DeploymentTimeout uint32 `yaml:"deployment_timeout"`
-	AllowFailure      bool   `yaml:"allow_failure"`
-}
-
 type Executor struct {
 	Deployment *deployment.Deployment
 	Config     *Config

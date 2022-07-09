@@ -13,7 +13,7 @@ type fileStruct struct {
 	Content string
 }
 
-// The File plugin allow easy interactions with files (create, exist, delete).
+// The File plugin allow easy interactions with files (create, is file exist, delete).
 type File struct{}
 
 func (s *File) Execute(data any, ctx *context.JobContext) (string, error) {
