@@ -58,7 +58,12 @@ func main() {
 		panic(err)
 	}
 
-	err = executor.NewExecutor(deployment, config, nil).ExecuteJobs()
+	exec, err := executor.NewExecutor(deployment, config, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	err = exec.ExecuteJobs()
 	if err != nil {
 		panic(err)
 	}

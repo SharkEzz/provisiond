@@ -8,6 +8,7 @@ require (
 )
 
 require (
-	golang.org/x/sys v0.0.0-20220702020025-31831981b65f // indirect
+	github.com/google/uuid v1.3.0
+	golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 )

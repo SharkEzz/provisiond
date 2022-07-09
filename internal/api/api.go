@@ -49,8 +49,10 @@ func (a *API) StartAPI() {
 
 	healthcheckHandler := http.HandlerFunc(handlers.HandleGetHealthcheck)
 	deployHandler := http.HandlerFunc(handlers.HandlePostDeploy)
+	deployStatusHandler := http.HandlerFunc(handlers.HandleGetDeploymentStatus)
 
 	http.Handle("/v1/healthcheck", healthcheckHandler)
+	http.Handle("/v1/deploy/log", a.checkPassword(deployStatusHandler))
 	http.Handle("/v1/deploy", a.checkPassword(deployHandler))
 
 	logging.LogOut("Started API server")

@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/SharkEzz/provisiond/internal/remote"
@@ -9,6 +10,7 @@ import (
 	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
+	"github.com/google/uuid"
 )
 
 type Config struct {
@@ -21,9 +23,10 @@ type Executor struct {
 	Deployment *deployment.Deployment
 	Config     *Config
 	logChannel chan string
+	UUID       string
 }
 
-func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) *Executor {
+func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) (*Executor, error) {
 	if cfg == nil {
 		cfg = &Config{
 			JobTimeout:        3600,
@@ -32,11 +35,17 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 		}
 	}
 
+	randId, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Executor{
 		dpl,
 		cfg,
 		logChannel,
-	}
+		randId.String(),
+	}, nil
 }
 
 func (e *Executor) ExecuteJobs() error {
@@ -145,25 +154,21 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error
 }
 
 func (e *Executor) Log(data string) {
-	// TODO: re-enable file logging
-	// logStr := logging.Log(data)
+	logStr := logging.Log(data)
 
-	// os.Mkdir(".deployments", 0750)
-	// filePath := fmt.Sprintf(".deployments/%s.txt", e.UUID)
+	go func() {
+		filePath := fmt.Sprintf("logs/deployments/%s.log", e.UUID)
 
-	// file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
-	// if err == nil {
-	// 	defer file.Close()
-	// }
+		file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0660)
+		if err == nil {
+			defer file.Close()
+		}
 
-	// if !e.logFileCreated {
-	// 	fmt.Fprintln(file, e.Deployment.Name)
-	// 	e.logFileCreated = true
-	// }
-	// fmt.Fprintln(file, logStr)
+		fmt.Fprintln(file, logStr)
+	}()
 
 	if e.logChannel != nil {
-		e.logChannel <- logging.Log(data)
+		e.logChannel <- logStr
 	}
 
 	logging.LogOut(data)
