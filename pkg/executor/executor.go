@@ -1,6 +1,7 @@
 package executor
 
 import (
+	goContext "context"
 	"fmt"
 	"os"
 	"time"
@@ -49,12 +50,17 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 }
 
 func (e *Executor) ExecuteJobs() error {
+	type deploymentContextKey string
+
 	e.Log(fmt.Sprintf("Starting execution of deployment '%s'", e.Deployment.Name))
 
-	ended := make(chan bool, 1)
-	errorChannel := make(chan error, 1)
+	deploymentContext, stopDeployment := goContext.WithCancel(goContext.Background())
+	deploymentContext = goContext.WithValue(deploymentContext, deploymentContextKey("errorChannel"), make(chan error))
+	defer stopDeployment()
 
 	go func() {
+		defer stopDeployment()
+		errorChannel := deploymentContext.Value(deploymentContextKey("errorChannel")).(chan error)
 		clients := map[string]*remote.Client{}
 
 		for name, config := range e.Deployment.Config.SSH {
@@ -68,6 +74,12 @@ func (e *Executor) ExecuteJobs() error {
 		defer remote.CloseAllClients(clients)
 
 		for _, job := range e.Deployment.Jobs {
+			select {
+			// Prevent the deployment gorouting from running other jobs if deployment is cancelled
+			case <-deploymentContext.Done():
+				return
+			default:
+			}
 			jobName := job["name"].(string)
 			jobHosts := job["hosts"].([]any)
 			for _, host := range jobHosts {
@@ -83,14 +95,14 @@ func (e *Executor) ExecuteJobs() error {
 					client = c
 				}
 
-				ctx := context.NewPluginContext(jobName, client, e.Log)
+				jobContext := context.NewJobContext(jobName, client, e.Log)
 
 				jobEnded := make(chan bool, 1)
 
 				go func(host string) {
 					e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
 
-					err := e.ExecuteJob(job, ctx)
+					err := e.ExecuteJob(job, jobContext)
 					if err != nil {
 						errorChannel <- err
 						return
@@ -107,18 +119,15 @@ func (e *Executor) ExecuteJobs() error {
 				}
 			}
 		}
-
-		ended <- true
 	}()
 
 	select {
-	case err := <-errorChannel:
+	case err := <-deploymentContext.Value(deploymentContextKey("errorChannel")).(chan error):
 		return err
-	case <-ended:
+	case <-deploymentContext.Done():
 		e.Log(fmt.Sprintf("Deployment '%s' done, executed %d jobs", e.Deployment.Name, len(e.Deployment.Jobs)))
 		return nil
 	case <-time.After(time.Duration(e.Config.DeploymentTimeout) * time.Second):
-		// TODO: stop goroutine
 		return fmt.Errorf("error: deployment '%s' timed out after %d seconds", e.Deployment.Name, e.Config.DeploymentTimeout)
 	}
 }

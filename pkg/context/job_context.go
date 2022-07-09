@@ -5,6 +5,8 @@ import (
 )
 
 // A JobContext is passed to each executed jobs
+//
+// TODO: use a context.Context
 type JobContext struct {
 	JobName string
 	client  *remote.Client
@@ -19,7 +21,7 @@ func (p *JobContext) Log(data string) {
 	p.logger(data)
 }
 
-func NewPluginContext(jobName string, client *remote.Client, logger func(data string)) *JobContext {
+func NewJobContext(jobName string, client *remote.Client, logger func(data string)) *JobContext {
 	return &JobContext{
 		jobName,
 		client,
