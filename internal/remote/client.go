@@ -90,7 +90,7 @@ func ConnectToLocalhost() *Client {
 	}
 }
 
-func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyPass string, variables map[string]string) (*Client, error) {
+func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyContent, keyPass string, variables map[string]string) (*Client, error) {
 	var sshClient *ssh.Client
 	var err error
 
@@ -98,7 +98,7 @@ func ConnectToHost(name, host string, port uint16, connectionType, username, pas
 	case "password":
 		sshClient, err = connectWithPassword(host, port, username, password)
 	case "key":
-		sshClient, err = connectWithPrivateKey(host, port, username, keyFile, keyPass)
+		sshClient, err = connectWithPrivateKey(host, port, username, keyFile, keyContent, keyPass)
 	default:
 		return nil, fmt.Errorf("error: unknown login method '%s'", connectionType)
 	}
@@ -134,21 +134,32 @@ func connectWithPassword(host string, port uint16, username, password string) (*
 	return client, nil
 }
 
-func connectWithPrivateKey(host string, port uint16, username, keyFile, keyPass string) (*ssh.Client, error) {
-	keyFileContent, err := os.ReadFile(keyFile)
-	if err != nil {
-		return nil, err
+func connectWithPrivateKey(host string, port uint16, username, keyFile, keyContent, keyPass string) (*ssh.Client, error) {
+	var signer ssh.Signer
+	var err error
+
+	if keyFile == "" && keyContent == "" {
+		return nil, fmt.Errorf("error: either keyFile or keyContent must be set")
+	}
+	if keyFile != "" && keyContent != "" {
+		return nil, fmt.Errorf("error: keyFile and keyContent cannot be set at the same time")
 	}
 
-	var signer ssh.Signer
+	if keyFile != "" {
+		fileContent, err := os.ReadFile(keyFile)
+		if err != nil {
+			return nil, err
+		}
+		keyContent = string(fileContent)
+	}
 
 	if keyPass != "" {
-		signer, err = ssh.ParsePrivateKeyWithPassphrase(keyFileContent, []byte(keyPass))
+		signer, err = ssh.ParsePrivateKeyWithPassphrase([]byte(keyContent), []byte(keyPass))
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		signer, err = ssh.ParsePrivateKey(keyFileContent)
+		signer, err = ssh.ParsePrivateKey([]byte(keyContent))
 		if err != nil {
 			return nil, err
 		}

@@ -73,7 +73,7 @@ func (e *Executor) ExecuteJobs() error {
 		clients := map[string]*remote.Client{}
 
 		for name, config := range e.Deployment.Config.SSH {
-			client, err := remote.ConnectToHost(name, config.Host, config.Port, config.Type, config.Username, config.Password, config.KeyFile, config.KeyPass, e.Deployment.Variables)
+			client, err := remote.ConnectToHost(name, config.Host, config.Port, config.Type, config.Username, config.Password, config.KeyFile, config.KeyContent, config.KeyPass, e.Deployment.Variables)
 			if err != nil {
 				errorChannel <- err
 				return
