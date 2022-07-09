@@ -130,6 +130,7 @@ func (e *Executor) ExecuteJobs() error {
 		}
 	}()
 
+	e.logFile.Close()
 	select {
 	case err := <-deploymentContext.Value(deploymentContextKey("errorChannel")).(chan error):
 		return err
