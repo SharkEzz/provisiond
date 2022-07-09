@@ -59,6 +59,7 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 }
 
 func (e *Executor) ExecuteJobs() error {
+	defer e.logFile.Close()
 	type deploymentContextKey string
 
 	e.Log(fmt.Sprintf("Starting execution of deployment '%s'", e.Deployment.Name))
@@ -97,9 +98,15 @@ func (e *Executor) ExecuteJobs() error {
 				if host == "localhost" {
 					client = remote.ConnectToLocalhost()
 				} else {
-					c, ok := clients[host.(string)]
+					hostStr, ok := host.(string)
 					if !ok {
-						errorChannel <- fmt.Errorf("error: host '%s' does not exist", host)
+						errorChannel <- fmt.Errorf("error: host '%s' is not a string", host)
+						continue
+					}
+					c, ok := clients[hostStr]
+					if !ok {
+						errorChannel <- fmt.Errorf("error: host '%s' does not exist", hostStr)
+						continue
 					}
 					client = c
 				}
@@ -129,7 +136,6 @@ func (e *Executor) ExecuteJobs() error {
 		}
 	}()
 
-	e.logFile.Close()
 	select {
 	case err := <-deploymentContext.Value(deploymentContextKey("errorChannel")).(chan error):
 		return err
