@@ -104,11 +104,11 @@ func (e *Executor) ExecuteJobs() error {
 					client = c
 				}
 
-				jobContext := context.NewJobContext(jobName, client, e.Log)
-
-				jobEnded := make(chan bool, 1)
+				jobContext, stopJob := context.NewJobContext(jobName, client, e.Log)
+				defer stopJob()
 
 				go func(host string) {
+					defer stopJob()
 					e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
 
 					err := e.ExecuteJob(job, jobContext)
@@ -117,11 +117,10 @@ func (e *Executor) ExecuteJobs() error {
 						return
 					}
 
-					jobEnded <- true
 				}(host.(string))
 
 				select {
-				case <-jobEnded:
+				case <-jobContext.Done():
 					continue
 				case <-time.After(time.Duration(e.Config.JobTimeout) * time.Second):
 					errorChannel <- fmt.Errorf("error: job '%s' on host '%s' timed out after %d seconds", jobName, host, e.Config.JobTimeout)
