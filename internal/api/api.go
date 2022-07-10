@@ -11,15 +11,14 @@ import (
 )
 
 type API struct {
-	host     string
-	port     uint16
-	password string
-	handlers *v1.API
-	config   *executor.Config
+	host        string
+	port        uint16
+	password    string
+	v1_handlers *v1.API
 }
 
 func NewAPI(host string, port uint16, password string, config *executor.Config) *API {
-	v1 := &v1.API{
+	v1_handlers := &v1.API{
 		Config: config,
 	}
 
@@ -27,12 +26,11 @@ func NewAPI(host string, port uint16, password string, config *executor.Config) 
 		host,
 		port,
 		password,
-		v1,
-		config,
+		v1_handlers,
 	}
 }
 
-func (a *API) checkPassword(next http.Handler) http.Handler {
+func (a *API) checkPasswordMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("password") != a.password {
 			w.WriteHeader(http.StatusBadRequest)
@@ -45,15 +43,13 @@ func (a *API) checkPassword(next http.Handler) http.Handler {
 }
 
 func (a *API) StartAPI() {
-	handlers := v1.API{}
-
-	healthcheckHandler := http.HandlerFunc(handlers.HandleGetHealthcheck)
-	deployHandler := http.HandlerFunc(handlers.HandlePostDeploy)
-	deployStatusHandler := http.HandlerFunc(handlers.HandleGetDeploymentStatus)
+	healthcheckHandler := http.HandlerFunc(a.v1_handlers.HandleGetHealthcheck)
+	deployHandler := http.HandlerFunc(a.v1_handlers.HandlePostDeploy)
+	deployStatusHandler := http.HandlerFunc(a.v1_handlers.HandleGetDeploymentStatus)
 
 	http.Handle("/v1/healthcheck", healthcheckHandler)
-	http.Handle("/v1/deploy/log", a.checkPassword(deployStatusHandler))
-	http.Handle("/v1/deploy", a.checkPassword(deployHandler))
+	http.Handle("/v1/deploy/log", a.checkPasswordMiddleware(deployStatusHandler))
+	http.Handle("/v1/deploy", a.checkPasswordMiddleware(deployHandler))
 
 	logging.LogOut("Started API server")
 
