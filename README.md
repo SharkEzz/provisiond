@@ -100,9 +100,9 @@ host: 127.0.0.1
 port: 22
 type: key
 username: your_username
-keyContent: "---BEGIN RSA PRIVATE KEY---..."
-keyFile: ./path/to/the/file.key
-keyPass: ""
+key_content: "---BEGIN RSA PRIVATE KEY---..."
+key_file: ./path/to/the/file.key
+key_pass: ""
 ```
 
 You can either provide the private key content, or the path to where the key is stored.

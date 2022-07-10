@@ -7,9 +7,9 @@ type SSHConfig struct {
 	Type       string
 	Username   string
 	Password   string
-	KeyFile    string
-	KeyContent string
-	KeyPass    string
+	KeyFile    string `yaml:"key_file"`
+	KeyContent string `yaml:"key_content"`
+	KeyPass    string `yaml:"key_pass"`
 }
 
 // A deployment is the configuration file that contain all the instructions to deploy your project.
