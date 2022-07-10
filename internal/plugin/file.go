@@ -16,7 +16,7 @@ type fileStruct struct {
 // The File plugin allow easy interactions with files (create, is file exist, delete).
 type File struct{}
 
-func (s *File) Execute(data any, ctx *context.JobContext) (string, error) {
+func (s *File) Execute(ctx *context.JobContext, data any) (string, error) {
 	fileData, err := utils.ConvertToType[fileStruct](data)
 	if err != nil {
 		return "", err

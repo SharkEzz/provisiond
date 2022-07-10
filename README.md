@@ -250,10 +250,10 @@ external `.so` files and register them for use in deployments files.
 The `Plugin` interface only define one method: `Execute`, which take 2
 parameters:
 
-- data : type `any`
-  - This is the data received from the deployment file
 - ctx : type `JobContext`
   - It contains the methods to interact with the targeted system
+- data : type `any`
+  - This is the data received from the deployment file
 
 The builded plugins must be in a `plugins` folder, in the same directory as the
 provisiond executable.

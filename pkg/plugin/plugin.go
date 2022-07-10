@@ -15,7 +15,7 @@ import (
 // which execute the content of the associated content in the deployment file.
 // It return the command stdout output.
 type Plugin interface {
-	Execute(data any, ctx *context.JobContext) (string, error)
+	Execute(ctx *context.JobContext, data any) (string, error)
 }
 
 // The Plugins map contain all the registered plugins,
