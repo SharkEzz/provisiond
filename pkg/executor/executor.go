@@ -1,13 +1,12 @@
 package executor
 
 import (
-	goContext "context"
+	"context"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/SharkEzz/provisiond/internal/remote"
-	"github.com/SharkEzz/provisiond/pkg/context"
 	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 	"github.com/SharkEzz/provisiond/pkg/plugin"
@@ -57,8 +56,8 @@ func (e *Executor) ExecuteJobs() error {
 
 	e.Log(fmt.Sprintf("Starting execution of deployment '%s'", e.Deployment.Name))
 
-	deploymentContext, stopDeployment := goContext.WithCancel(goContext.Background())
-	deploymentContext = goContext.WithValue(deploymentContext, deploymentContextKey("errorChannel"), make(chan error))
+	deploymentContext, stopDeployment := context.WithCancel(context.Background())
+	deploymentContext = context.WithValue(deploymentContext, deploymentContextKey("errorChannel"), make(chan error))
 	defer stopDeployment()
 
 	go func() {
@@ -99,7 +98,7 @@ func (e *Executor) ExecuteJobs() error {
 					client = c
 				}
 
-				jobContext, stopJob := context.NewJobContext(jobName, client, e.Log)
+				jobContext, stopJob := deployment.NewJobContext(jobName, client, e.Log)
 				defer stopJob()
 
 				go func(host string) {
@@ -135,7 +134,7 @@ func (e *Executor) ExecuteJobs() error {
 	}
 }
 
-func (e *Executor) ExecuteJob(job map[string]any, ctx *context.JobContext) error {
+func (e *Executor) ExecuteJob(job map[string]any, ctx *deployment.JobContext) error {
 	for key, value := range job {
 		// Skip keys that are not plugins
 		if key == "hosts" ||

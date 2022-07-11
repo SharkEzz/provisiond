@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/SharkEzz/provisiond/internal/plugin"
-	"github.com/SharkEzz/provisiond/pkg/context"
+	"github.com/SharkEzz/provisiond/pkg/deployment"
 	"github.com/SharkEzz/provisiond/pkg/logging"
 )
 
@@ -15,7 +15,7 @@ import (
 // which execute the content of the associated content in the deployment file.
 // It return the command stdout output.
 type Plugin interface {
-	Execute(ctx *context.JobContext, data any) (string, error)
+	Execute(ctx *deployment.JobContext, data any) (string, error)
 }
 
 // The Plugins map contain all the registered plugins,
@@ -55,7 +55,7 @@ func init() {
 		loadCount++
 	}
 
-	logging.LogOut(fmt.Sprintf("Loaded %d external plugins, %d plugins in total", loadCount, len(Plugins)))
+	logging.LogOut(fmt.Sprintf("Loaded %d external plugins, %d internal, %d plugins in total", loadCount, len(Plugins)-loadCount, len(Plugins)))
 }
 
 func loadPlugin(path string) (Plugin, error) {

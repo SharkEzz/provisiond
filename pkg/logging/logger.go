@@ -15,20 +15,6 @@ func generateString(data string) string {
 
 func Log(text string) string {
 	return generateString(text)
-	// switch level {
-	// case "info":
-	// 	return fmt.Sprintf("\x1B[34m%s\x1b[0m", generateString(text))
-	// case "warn":
-	// 	return fmt.Sprintf("\x1b[33m%s\x1b[0m", generateString(text))
-	// case "error":
-	// 	return fmt.Sprintf("\x1b[31m%s\x1b[0m", generateString(text))
-	// case "debug":
-	// 	return fmt.Sprintf("\x1b[34m%s\x1b[0m", generateString(text))
-	// case "success":
-	// 	return fmt.Sprintf("\x1b[32m%s\x1b[0m", generateString(text))
-	// default:
-	// 	return text
-	// }
 }
 
 func LogOut(text string) {
