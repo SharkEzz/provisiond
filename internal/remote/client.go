@@ -62,6 +62,11 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 		cmd = exec.Command(shell, "-c", command)
 	}
 
+	// Set environment for the current command
+	for key, value := range c.variables {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+	}
+
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println(logging.Log(err.Error()))
@@ -82,11 +87,12 @@ func CloseAllClients(clients map[string]*Client) {
 	}
 }
 
-func ConnectToLocalhost() *Client {
+func ConnectToLocalhost(variables map[string]string) *Client {
 	return &Client{
 		name:        "localhost",
 		sshClient:   nil,
 		isLocalhost: true,
+		variables:   variables,
 	}
 }
 

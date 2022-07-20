@@ -88,7 +88,7 @@ func (e *Executor) ExecuteJobs() error {
 				var client *remote.Client
 
 				if host == "localhost" {
-					client = remote.ConnectToLocalhost()
+					client = remote.ConnectToLocalhost(e.Deployment.Variables)
 				} else {
 					c, ok := clients[host.(string)]
 					if !ok {
