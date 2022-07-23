@@ -26,30 +26,38 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 
 	// If the client is remote (SSH)
 	if !c.isLocalhost {
-		session, err := c.sshClient.NewSession()
-		if err != nil {
-			fmt.Println(logging.Log(err.Error()))
-			return "", err
-		}
-		defer session.Close()
-
-		for name, value := range c.variables {
-			err := session.Setenv(name, value)
-			if err != nil {
-				return "", fmt.Errorf("error while setting %s variable", name)
-			}
-		}
-
-		// err can be *ssh.ExitError
-		output, err := session.Output(command)
-		if err != nil {
-			fmt.Println(logging.Log(err.Error()))
-			return "", err
-		}
-
-		return string(output), nil
+		return c.executeRemote(command)
 	}
 
+	return c.executeLocal(command)
+}
+
+func (c *Client) executeRemote(command string) (string, error) {
+	session, err := c.sshClient.NewSession()
+	if err != nil {
+		fmt.Println(logging.Log(err.Error()))
+		return "", err
+	}
+	defer session.Close()
+
+	for name, value := range c.variables {
+		err := session.Setenv(name, value)
+		if err != nil {
+			return "", fmt.Errorf("error while setting %s variable", name)
+		}
+	}
+
+	// err can be *ssh.ExitError
+	output, err := session.Output(command)
+	if err != nil {
+		fmt.Println(logging.Log(err.Error()))
+		return "", err
+	}
+
+	return string(output), nil
+}
+
+func (c *Client) executeLocal(command string) (string, error) {
 	var cmd *exec.Cmd
 
 	if runtime.GOOS == "windows" {
@@ -96,7 +104,7 @@ func ConnectToLocalhost(variables map[string]string) *Client {
 	}
 }
 
-func ConnectToHost(name, host string, port uint16, connectionType, username, password, keyFile, keyContent, keyPass string, variables map[string]string) (*Client, error) {
+func NewClient(name, host string, port uint16, connectionType, username, password, keyFile, keyContent, keyPass string, variables map[string]string) (*Client, error) {
 	var sshClient *ssh.Client
 	var err error
 

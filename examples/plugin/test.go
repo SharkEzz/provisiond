@@ -6,7 +6,7 @@ import (
 
 type Test struct{}
 
-func (t *Test) Execute(data any, ctx *deployment.JobContext) (string, error) {
+func (t *Test) Execute(ctx *deployment.JobContext, data any) (string, error) {
 	return "test", nil
 }
 
