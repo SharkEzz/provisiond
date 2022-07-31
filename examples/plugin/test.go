@@ -7,7 +7,8 @@ import (
 type Test struct{}
 
 func (t *Test) Execute(ctx *deployment.JobContext, data any) (string, error) {
-	return "test", nil
+	ctx.Log("Hello from plugin")
+	return "hello", nil
 }
 
 func GetPlugin() (p any) {

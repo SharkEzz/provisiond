@@ -17,6 +17,7 @@ type API struct {
 	v1_handlers *v1.API
 }
 
+// Create a new API instance.
 func NewAPI(host string, port uint16, password string, config *executor.Config) *API {
 	v1_handlers := &v1.API{
 		Config: config,
@@ -30,6 +31,7 @@ func NewAPI(host string, port uint16, password string, config *executor.Config) 
 	}
 }
 
+// Middleware to check if the password for accessing the API is provided.
 func (a *API) checkPasswordMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("password") != a.password {

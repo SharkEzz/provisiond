@@ -36,19 +36,24 @@ be followed by a string that will allow accessing the API.
 ```
 
 Aditionally, you can provide the flag `-apiPort` followed by the port you want
-to listen (must be an integer between 0 and 65536).
+to listen.
 
 By default, the API will be available on `0.0.0.0:7655`.
 
 There is currently 3 routes available:
 
-- `/v1/healthcheck`: will return a 200 response code and a JSON body with
+- `/v1/healthcheck`: will return a 200 response code and a JSON body with :
+
   `{ 'result': 'ok' }`
 - `/v1/deploy`: this route is POST only, you must provide a header named
   `password` with the choosen password as the value. The body of the request
   must be a deployment file content in plain text.
+
+  You can use this route to start a deployment remotely.
 - `/v1/deploy/log?id=xxx` : this is a GET route only. It take a query parameter
   `id`, which is equal to the ID provided when you launched the deployment.
+
+  You can use this route to get the logs from a running (or past) deployment.
 
 ### Writing a deployment file
 
@@ -198,9 +203,6 @@ The file plugin allow you to interact with files easily.
 
 ### Configuration
 
-> The configuration is currently only supported when executing provisiond from
-> the CLI, not from the REST API
-
 provisiond allow you to define global configuration for your deployments.
 
 As of now, a very little options are configurable globally:
@@ -258,12 +260,4 @@ parameters:
 The builded plugins must be in a `plugins` folder, in the same directory as the
 provisiond executable.
 
-Check the example in the `pkg/plugin/example` folder.
-
-## Roadmap
-
-- Add tests
-- Launch jobs in goroutines (allow for supervision, timeout, cancels, etc...)
-- Clean TODOS
-- Dashboard :eyes:
-- Online documentation
+Check the example in the `examples/plugin` folder.
