@@ -173,5 +173,5 @@ func (e *Executor) Log(data string) {
 		e.logChannel <- logStr
 	}
 
-	logging.LogOut(data)
+	logging.LogOut(data, logging.INFO)
 }

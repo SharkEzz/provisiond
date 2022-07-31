@@ -29,7 +29,7 @@ var Plugins = map[string]Plugin{
 func init() {
 	// Do not attempt to load plugins if the plugins folder does not exist
 	if _, err := os.Stat("./plugins"); os.IsNotExist(err) {
-		logging.LogOut(fmt.Sprintf("Loaded %d internal plugins", len(Plugins)))
+		logging.LogOut(fmt.Sprintf("Loaded %d internal plugins", len(Plugins)), logging.INFO)
 		return
 	}
 
@@ -55,7 +55,7 @@ func init() {
 		loadCount++
 	}
 
-	logging.LogOut(fmt.Sprintf("Loaded %d external plugins, %d internal, %d plugins in total", loadCount, len(Plugins)-loadCount, len(Plugins)))
+	logging.LogOut(fmt.Sprintf("Loaded %d external plugins, %d internal, %d plugins in total", loadCount, len(Plugins)-loadCount, len(Plugins)), logging.INFO)
 }
 
 func loadPlugin(path string) (Plugin, error) {

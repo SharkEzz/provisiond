@@ -24,7 +24,7 @@ func main() {
 
 	flag.Parse()
 
-	logging.LogOut(fmt.Sprintf("provisiond %s - Compiled on %s", version, buildTime.Format("2006-01-02 15:04:05")))
+	logging.LogOut(fmt.Sprintf("provisiond %s - Compiled on %s", version, buildTime.Format("2006-01-02 15:04:05")), logging.INFO)
 
 	config, err := executor.LoadConfig()
 	if err != nil {

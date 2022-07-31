@@ -30,7 +30,7 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	logging.LogOut("Loaded config from ./config.yaml")
+	logging.LogOut("Loaded config from ./config.yaml", logging.INFO)
 
 	return config, nil
 }

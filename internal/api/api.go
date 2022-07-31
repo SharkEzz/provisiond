@@ -51,7 +51,7 @@ func (a *API) StartAPI() {
 	http.Handle("/v1/deploy/log", a.checkPasswordMiddleware(deployStatusHandler))
 	http.Handle("/v1/deploy", a.checkPasswordMiddleware(deployHandler))
 
-	logging.LogOut("Started API server")
+	logging.LogOut("Started API server", logging.SUCCESS)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", a.host, a.port), nil))
 }
