@@ -14,10 +14,14 @@ type Config struct {
 	AllowFailure      bool   `yaml:"allow_failure"`
 }
 
-// Parse the config.yaml file (if existing) and return a Config struct.
+// Parse the config.yaml file (if existing) and return a Config struct, or a default config.
 func LoadConfig() (*Config, error) {
 	if _, err := os.Stat("./config.yaml"); err != nil {
-		return nil, nil
+		return &Config{
+			JobTimeout:        3600,  // 1 hour
+			DeploymentTimeout: 86400, // 1 day
+			AllowFailure:      false,
+		}, nil
 	}
 
 	config := &Config{}

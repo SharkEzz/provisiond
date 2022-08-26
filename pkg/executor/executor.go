@@ -13,6 +13,8 @@ import (
 	"github.com/google/uuid"
 )
 
+type deploymentContextKey string
+
 type Executor struct {
 	Deployment *deployment.Deployment
 	Config     *Config
@@ -23,11 +25,7 @@ type Executor struct {
 
 func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string) (*Executor, error) {
 	if cfg == nil {
-		cfg = &Config{
-			JobTimeout:        3600,  // 1 hour
-			DeploymentTimeout: 86400, // 1 day
-			AllowFailure:      false,
-		}
+		return nil, fmt.Errorf("error: cfg cannot be nil")
 	}
 
 	randId, err := uuid.NewRandom()
@@ -52,7 +50,6 @@ func NewExecutor(dpl *deployment.Deployment, cfg *Config, logChannel chan string
 
 func (e *Executor) ExecuteJobs() error {
 	defer e.logFile.Close()
-	type deploymentContextKey string
 
 	e.Log(fmt.Sprintf("Starting execution of deployment '%s'", e.Deployment.Name))
 
@@ -85,14 +82,20 @@ func (e *Executor) ExecuteJobs() error {
 			jobName := job["name"].(string)
 			jobHosts := job["hosts"].([]any)
 			for _, host := range jobHosts {
+				hostString, ok := host.(string)
+				if !ok {
+					errorChannel <- fmt.Errorf("error: invalid host type %#v", host)
+					return
+				}
+
 				var client *remote.Client
 
-				if host == "localhost" {
+				if hostString == "localhost" {
 					client = remote.ConnectToLocalhost(e.Deployment.Variables)
 				} else {
-					c, ok := clients[host.(string)]
+					c, ok := clients[hostString]
 					if !ok {
-						errorChannel <- fmt.Errorf("error: host %#v does not exist", host)
+						errorChannel <- fmt.Errorf("error: host '%s' does not exist", hostString)
 						return
 					}
 					client = c
@@ -101,23 +104,22 @@ func (e *Executor) ExecuteJobs() error {
 				jobContext, stopJob := deployment.NewJobContext(jobName, client, e.Log)
 				defer stopJob()
 
-				go func(host string) {
+				go func() {
 					defer stopJob()
-					e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, host))
+					e.Log(fmt.Sprintf("Executing job '%s' on host '%s'", jobName, hostString))
 
 					err := e.ExecuteJob(job, jobContext)
 					if err != nil {
 						errorChannel <- err
 						return
 					}
-
-				}(host.(string))
+				}()
 
 				select {
 				case <-jobContext.Done():
 					continue
 				case <-time.After(time.Duration(e.Config.JobTimeout) * time.Second):
-					errorChannel <- fmt.Errorf("error: job '%s' on host '%s' timed out after %d seconds", jobName, host, e.Config.JobTimeout)
+					errorChannel <- fmt.Errorf("error: job '%s' on host '%s' timed out after %d seconds", jobName, hostString, e.Config.JobTimeout)
 				}
 			}
 		}
@@ -151,7 +153,7 @@ func (e *Executor) ExecuteJob(job map[string]any, ctx *deployment.JobContext) er
 		output, err := plg.Execute(ctx, value)
 		if err != nil {
 			if allowedToFail, ok := job["allow_failure"].(bool); ok && allowedToFail || e.Config.AllowFailure {
-				e.Log(fmt.Sprintf("Job %s failed but failure allowed: %s", job["name"], err))
+				e.Log(fmt.Sprintf("Job '%s' failed but failure allowed: %s", job["name"], err))
 			} else {
 				return err
 			}

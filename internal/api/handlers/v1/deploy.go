@@ -6,7 +6,7 @@ import (
 
 	"github.com/SharkEzz/provisiond/pkg/executor"
 	"github.com/SharkEzz/provisiond/pkg/loader"
-	utils "github.com/SharkEzz/provisiond/pkg/utils"
+	"github.com/SharkEzz/provisiond/pkg/utils"
 )
 
 func (a *API) HandlePostDeploy(w http.ResponseWriter, req *http.Request) {

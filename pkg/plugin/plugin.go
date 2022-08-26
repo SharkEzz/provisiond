@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"log"
 	"os"
 	goPlugin "plugin"
 	"strings"
@@ -26,7 +27,7 @@ var Plugins = map[string]Plugin{
 }
 
 // Load all the plugins in ./plugins (relative to the current executable directory)
-func init() {
+func InitPlugins() {
 	// Do not attempt to load plugins if the plugins folder does not exist
 	if _, err := os.Stat("./plugins"); os.IsNotExist(err) {
 		logging.LogOut(fmt.Sprintf("Loaded %d internal plugins", len(Plugins)), logging.INFO)
@@ -35,7 +36,7 @@ func init() {
 
 	pluginsDir, err := os.ReadDir("./plugins")
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	loadCount := 0
@@ -49,7 +50,7 @@ func init() {
 
 		loadedPlugin, err := loadPlugin(fmt.Sprintf("./plugins/%s", pluginItem.Name()))
 		if err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 		Plugins[pluginName] = loadedPlugin
 		loadCount++
